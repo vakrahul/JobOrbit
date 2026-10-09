@@ -68,7 +68,11 @@ try:
         # ── Scheduler ─────────────────────────────────────────────────────────
         SYNC_INTERVAL_HOURS: int = 3
 
-        # ── Payments ─────────────────────────────────────────────────────────
+        # ── Payments (Cashfree & Razorpay) ──────────────────────────────────
+        CASHFREE_APP_ID: Optional[str] = None
+        CASHFREE_SECRET_KEY: Optional[str] = None
+        CASHFREE_ENV: str = "TEST"  # "TEST" (Sandbox) or "PROD" (Live)
+        CASHFREE_API_VERSION: str = "2023-08-01"
         RAZORPAY_KEY_ID: Optional[str] = None
         RAZORPAY_KEY_SECRET: Optional[str] = None
         VIP_PRICE_LIFETIME: int = 99            # INR
@@ -156,6 +160,10 @@ except ImportError:
             "Mozilla/5.0 JobOrbitAggregator/2.0"
         )
         SYNC_INTERVAL_HOURS = int(os.getenv("SYNC_INTERVAL_HOURS", "3"))
+        CASHFREE_APP_ID = os.getenv("CASHFREE_APP_ID")
+        CASHFREE_SECRET_KEY = os.getenv("CASHFREE_SECRET_KEY")
+        CASHFREE_ENV = os.getenv("CASHFREE_ENV", "TEST")
+        CASHFREE_API_VERSION = os.getenv("CASHFREE_API_VERSION", "2023-08-01")
         RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
         RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
         VIP_PRICE_LIFETIME = 99

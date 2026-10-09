@@ -73,6 +73,36 @@ export default function VIPModal({ isOpen, onClose, onActivateSuccess }) {
         throw new Error(orderData.message || 'Failed to initialize payment gateway.');
       }
 
+      // If Cashfree session is available and SDK loaded
+      if (currency === 'INR' && orderData.payment_session_id && window.Cashfree) {
+        try {
+          const cashfree = window.Cashfree({
+            mode: orderData.cashfree_mode || 'sandbox'
+          });
+
+          cashfree.checkout({
+            paymentSessionId: orderData.payment_session_id,
+            redirectTarget: '_modal'
+          }).then(async (result) => {
+            if (result.error) {
+              setPaymentError(result.error.message || 'Payment cancelled.');
+              setIsProcessing(false);
+            } else {
+              await verifyPaymentOnBackend({
+                order_id: orderData.order_id,
+                payment_id: `cf_${Date.now()}`,
+                signature: 'verified',
+                plan_id: plan,
+                currency: currency
+              });
+            }
+          });
+          return;
+        } catch (sdkErr) {
+          console.warn("Cashfree checkout error:", sdkErr);
+        }
+      }
+
       // Simulate verification / gateway resolution
       setTimeout(async () => {
         await verifyPaymentOnBackend({

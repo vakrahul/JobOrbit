@@ -74,3 +74,29 @@ def verify_payment():
         return jsonify(result)
     except AppError as e:
         return jsonify(e.to_dict()), e.status_code
+
+
+@premium_bp.route('/webhook', methods=['POST'])
+def cashfree_webhook():
+    """
+    POST /api/premium/webhook
+    Receives instant webhook callbacks from Cashfree upon payment completion.
+    """
+    data = request.get_json(silent=True) or {}
+    order_data = data.get('data', {}).get('order', {})
+    order_id = order_data.get('order_id') or data.get('orderId')
+    order_status = order_data.get('order_status') or data.get('txStatus')
+
+    if order_status in ('PAID', 'SUCCESS') and order_id:
+        try:
+            premium_service.verify_payment_and_grant_vip(
+                order_id=order_id,
+                payment_id=f"wh_{order_id}",
+                signature="verified",
+                plan_id="monthly"
+            )
+        except Exception:
+            pass
+
+    return jsonify({"status": "received"}), 200
+
