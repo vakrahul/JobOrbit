@@ -77,6 +77,6 @@ htmlcov/
 .claude/skills/
 .agents/skills/
 .github/skills/
-skills-lock.json
-
+.claude/
+.codex/
 .insta/.agent-session-*.tmp
