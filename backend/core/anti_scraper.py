@@ -52,7 +52,7 @@ BANNED_IPS: dict[str, float] = {}
 REQUEST_VELOCITY: dict[str, list[float]] = {}
 VELOCITY_WINDOW_SECONDS = 10
 VELOCITY_MAX_REQUESTS = 50  # Max 50 requests in 10s before auto-ban
-BAN_DURATION_SECONDS = 3600  # 1 hour ban for bot violations
+BAN_DURATION_SECONDS = 60  # 1 minute temporary cooldown for honeypots / bursts
 
 
 def get_client_ip() -> str:
@@ -158,12 +158,10 @@ def anti_scraper_shield():
     # 3. User-Agent Header Inspection
     ua = (request.headers.get("User-Agent") or "").lower().strip()
     if not ua:
-        ban_ip(ip, "Missing User-Agent header")
         return jsonify({"status": "error", "error_code": "BOT_DETECTED", "message": "Access denied."}), 403
 
     for bot_sig in DISALLOWED_USER_AGENTS:
         if bot_sig in ua:
-            ban_ip(ip, f"Blacklisted User-Agent detected: {ua}")
             return jsonify({
                 "status": "error",
                 "error_code": "BOT_DETECTED",
