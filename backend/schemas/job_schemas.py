@@ -24,7 +24,7 @@ class JobSearchSchema(Schema):
     limit = fields.Int(load_default=24, validate=validate.Range(min=1, max=100))
 
     @validates('q')
-    def validate_q(self, value):
+    def validate_q(self, value, **kwargs):
         # Block SQL injection patterns
         bad = ["'", '"', ';', '--', 'DROP', 'SELECT', 'INSERT', 'DELETE']
         if any(b.lower() in value.lower() for b in bad):
@@ -73,7 +73,7 @@ class FitCheckSchema(Schema):
     prof_id = fields.Int(load_default=None, allow_none=True)
 
     @validates('job_id')
-    def validate_ids(self, value):
+    def validate_ids(self, value, **kwargs):
         pass  # at least one of job_id or prof_id checked at service layer
 
 
