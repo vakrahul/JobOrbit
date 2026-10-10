@@ -181,7 +181,9 @@ AUTHORIZATION_CONSENT_TEMPLATE = """
 @oauth_bp.route('/.well-known/oauth-authorization-server', methods=['GET'])
 def oauth_metadata():
     """RFC 8414 OAuth 2.0 Authorization Server Metadata"""
-    base_url = settings.APP_URL.rstrip('/') if hasattr(settings, 'APP_URL') and settings.APP_URL else "https://api.joborbit.live"
+    proto = request.headers.get('X-Forwarded-Proto', request.scheme or 'https')
+    host = request.headers.get('X-Forwarded-Host', request.host)
+    base_url = f"{proto}://{host}".rstrip('/')
     return jsonify({
         "issuer": base_url,
         "authorization_endpoint": f"{base_url}/oauth/authorize",

@@ -56,6 +56,9 @@ def resolve_mcp_user():
 @mcp_bp.route('/mcp/manifest', methods=['GET'])
 @mcp_bp.route('/.well-known/mcp', methods=['GET'])
 def mcp_manifest():
+    proto = request.headers.get('X-Forwarded-Proto', request.scheme or 'https')
+    host = request.headers.get('X-Forwarded-Host', request.host)
+    base_url = f"{proto}://{host}".rstrip('/')
     return jsonify({
         "schema_version": "v1",
         "name_for_model": "joborbit",
@@ -64,12 +67,12 @@ def mcp_manifest():
         "description_for_human": "Find jobs, tailor resumes with Gemini AI, and prepare applications on JobOrbit.",
         "auth": {
             "type": "oauth",
-            "authorization_url": "https://api.joborbit.live/oauth/authorize",
-            "token_url": "https://api.joborbit.live/oauth/token",
+            "authorization_url": f"{base_url}/oauth/authorize",
+            "token_url": f"{base_url}/oauth/token",
             "scope": "jobs:read jobs:apply profile:read"
         },
         "mcp": {
-            "endpoint": "https://api.joborbit.live/mcp",
+            "endpoint": f"{base_url}/mcp",
             "protocol_version": "2024-11-05",
             "tools_count": len(TOOL_DEFINITIONS)
         }
