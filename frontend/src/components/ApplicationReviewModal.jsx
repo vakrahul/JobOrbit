@@ -21,11 +21,18 @@ export default function ApplicationReviewModal({ approvalToken, onClose, onActio
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
 
   useEffect(() => {
     if (!approvalToken) return;
     loadReviewData();
   }, [approvalToken]);
+
+  const getAuthToken = () => {
+    return localStorage.getItem('joborbit_user_token') || localStorage.getItem('joborbit_jwt_token') || '';
+  };
 
   const loadReviewData = async () => {
     setLoading(true);
@@ -35,6 +42,9 @@ export default function ApplicationReviewModal({ approvalToken, onClose, onActio
       const json = await res.json();
       if (res.ok && json.status === 'success') {
         setReviewData(json.data);
+        if (json.data?.draft?.user_email) {
+          setAuthEmail(json.data.draft.user_email);
+        }
       } else {
         setError(json.message || 'Unable to retrieve application review details.');
       }
@@ -45,21 +55,64 @@ export default function ApplicationReviewModal({ approvalToken, onClose, onActio
     }
   };
 
-  const handleDecision = async (approved) => {
+  const handleQuickLogin = async (e) => {
+    e?.preventDefault();
+    if (!authPassword) return;
+    setAuthLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: authEmail || reviewData?.draft?.user_email || 'vakitirahul@gmail.com',
+          password: authPassword
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.status === 'success') {
+        localStorage.setItem('joborbit_user_token', data.token);
+        localStorage.setItem('joborbit_user', JSON.stringify(data.user));
+        if (data.user?.is_premium) {
+          localStorage.setItem('joborbit_is_vip', 'true');
+        }
+        setError('');
+        // Automatically approve application upon successful sign in
+        await handleDecision(true, data.token);
+      } else {
+        setError(data.message || 'Invalid email or password.');
+      }
+    } catch (err) {
+      setError('Failed to log in.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleDecision = async (approved, overrideToken = null) => {
     setActionLoading(true);
     setError('');
     try {
+      const token = overrideToken || getAuthToken();
+      const payload = {
+        approval_token: approvalToken,
+        approved: approved,
+        rejection_reason: approved ? null : rejectionReason || 'Declined by candidate.'
+      };
+      if (!token && authPassword) {
+        payload.email = authEmail || reviewData?.draft?.user_email || 'vakitirahul@gmail.com';
+        payload.password = authPassword;
+      }
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch('/api/applications/review', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('joborbit_jwt_token') || ''}`
-        },
-        body: JSON.stringify({
-          approval_token: approvalToken,
-          approved: approved,
-          rejection_reason: approved ? null : rejectionReason || 'Declined by candidate.'
-        })
+        headers,
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (res.ok && data.status === 'success') {
@@ -114,6 +167,43 @@ export default function ApplicationReviewModal({ approvalToken, onClose, onActio
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
+          )}
+
+          {/* Inline Quick Login if Session Expired or Logged Out */}
+          {(!getAuthToken() || error.includes('Authentication')) && (
+            <form onSubmit={handleQuickLogin} className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
+                <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Sign in to confirm application as {authEmail || reviewData?.draft?.user_email || 'vakitirahul@gmail.com'}</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <input
+                  type="email"
+                  value={authEmail || reviewData?.draft?.user_email || ''}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  placeholder="candidate@example.com"
+                  className="p-2 border border-amber-200 rounded-lg bg-white text-slate-800"
+                />
+                <input
+                  type="password"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  placeholder="Enter JobOrbit password"
+                  required
+                  className="p-2 border border-amber-200 rounded-lg bg-white text-slate-800"
+                />
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-[11px] text-amber-800/80">Signing in authenticates this single-use approval.</span>
+                <button
+                  type="submit"
+                  disabled={authLoading || !authPassword}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {authLoading ? 'Signing in...' : 'Sign In & Approve'}
+                </button>
+              </div>
+            </form>
           )}
 
           {!loading && reviewData && (

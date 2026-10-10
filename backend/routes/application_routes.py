@@ -100,11 +100,18 @@ def get_approval_review_data(approval_token):
     if not draft:
         return jsonify({'status': 'error', 'message': 'Draft not found.'}), 404
 
+    from models.user import User
+    draft_user = User.query.get(draft.user_id)
+    draft_dict = draft.to_dict()
+    if draft_user:
+        draft_dict['user_email'] = draft_user.email
+        draft_dict['user_name'] = draft_user.name
+
     return jsonify({
         'status': 'success',
         'data': {
             'approval': approval.to_dict(),
-            'draft': draft.to_dict(),
+            'draft': draft_dict,
             'is_valid_hash': (approval.content_hash == draft.content_hash)
         }
     })
@@ -116,9 +123,6 @@ def submit_approval_decision():
     Candidate grants or rejects approval for a pending application draft.
     """
     user = get_current_user_from_request()
-    if not user:
-        return jsonify({'status': 'error', 'message': 'Authentication required.'}), 401
-
     data = request.get_json(silent=True) or {}
     token = data.get('approval_token')
     approved = bool(data.get('approved', False))
@@ -126,6 +130,19 @@ def submit_approval_decision():
 
     if not token:
         return jsonify({'status': 'error', 'message': 'approval_token is required.'}), 400
+
+    # If no session/bearer token present, allow verifying via credentials
+    if not user:
+        from repositories.user_repository import user_repo
+        email = (data.get('email') or '').strip().lower()
+        password = (data.get('password') or '').strip()
+        if email and password:
+            candidate = user_repo.authenticate_with_password(email, password)
+            if candidate:
+                user = candidate
+
+    if not user:
+        return jsonify({'status': 'error', 'message': 'Authentication required. Please sign in to approve this application.'}), 401
 
     result = application_service.respond_to_approval(
         user_id=user.id,
