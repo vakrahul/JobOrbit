@@ -17,6 +17,7 @@ import TermsPolicyModal from './components/TermsPolicyModal';
 import AuditAgent from './components/AuditAgent';
 import ErrorBoundary from './components/ErrorBoundary';
 import AuthModal from './components/AuthModal';
+import UserProfileModal from './components/UserProfileModal';
 
 export default function App() {
   const getInitialView = () => {
@@ -72,6 +73,7 @@ export default function App() {
   const [legalModalTab, setLegalModalTab] = useState('terms');
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem('joborbit_admin_token') || '');
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [authPromptMessage, setAuthPromptMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -225,10 +227,11 @@ export default function App() {
         setCurrentView={handleSetView}
         onOpenVIP={() => handleSetView('vip')}
         onOpenLegal={handleOpenLegal}
-        onOpenAuth={() => handleOpenAuth('')}
+        onOpenAuth={(mode) => handleOpenAuth(mode === 'signup' ? 'Sign up to access verified applications' : '')}
+        onOpenProfile={() => setProfileModalOpen(true)}
         currentUser={currentUser}
         onSignOut={handleSignOut}
-        totalJobs={stats?.stats?.total_jobs || 13259}
+        totalJobs={stats?.stats?.total_jobs || 13538}
       />
 
       {/* Modern Marquee Strip */}
@@ -246,8 +249,10 @@ export default function App() {
               onOpenResume={() => handleSetView('resume')}
               onOpenAudit={() => handleSetView('audit')}
               onOpenVIP={() => handleSetView('vip')}
-            onOpenLegal={handleOpenLegal}
-          />
+              onOpenLegal={handleOpenLegal}
+              onOpenProfile={() => setProfileModalOpen(true)}
+              onOpenJob={(id) => handleSetView('job-detail', id)}
+            />
         ) : currentView === 'job-detail' && selectedJobId ? (
           <JobDetailPage
             jobId={selectedJobId}
@@ -422,6 +427,15 @@ export default function App() {
         }}
         promptMessage={authPromptMessage}
         onSuccess={(user) => setCurrentUser(user)}
+      />
+
+      {/* Candidate Profile & Feedback Dashboard Modal */}
+      <UserProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        currentUser={currentUser}
+        onOpenVIP={() => setVipModalOpen(true)}
+        onNavigateToTracker={() => handleSetView('tracker')}
       />
 
     </div>

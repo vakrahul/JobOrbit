@@ -430,99 +430,78 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                   onClick={() => onOpenJob ? onOpenJob(job.id) : (window.location.hash = `job-${job.id}`)}
                 >
                   <div className="space-y-3">
-                    {/* Header Row: Company & Badges */}
-                    <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-2.5">
-                      <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide truncate max-w-[150px]">
-                        {job.company}
-                      </span>
+                    {/* Header Row: Company Monogram & Details */}
+                    <div className="flex items-start justify-between gap-3 border-b border-[#EFE9DF] pb-3">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="w-9 h-9 rounded-xl bg-[#F4EFE6] text-stone-800 font-bold flex items-center justify-center text-xs shrink-0 border border-[#E4DEC8]">
+                          {(job.company || 'C')[0].toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="text-xs font-bold text-stone-800 uppercase tracking-wider block truncate">
+                            {job.company}
+                          </span>
+                          <span className="text-[11px] text-stone-400 font-medium block">
+                            {job.posted_date_text || 'Recently posted'}
+                          </span>
+                        </div>
+                      </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                        {/* Distinct Source Platform Badge */}
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {job.is_vip_exclusive && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-2xs">
-                            <span>VIP Drop</span>
-                          </span>
-                        )}
-
-                        {job.source_platform ? (
-                          <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
-                            job.source_platform.id === 'linkedin'
-                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                              : job.source_platform.id === 'internshala'
-                              ? 'bg-cyan-100 text-cyan-800 border border-cyan-200'
-                              : job.source_platform.id === 'wellfound'
-                              ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                              : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                          }`}>
-                            
-                            {job.source_platform.badge_label || job.source}
-                          </span>
-                        ) : job.source ? (
-                          <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                            {job.source}
-                          </span>
-                        ) : null}
-
-                        {job.posted_date_text === 'Today' || job.is_new_today ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>Today</span>
-                          </span>
-                        ) : (
-                          <span className="px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                            {job.posted_date_text || 'Recently'}
+                          <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-[#F4EFE6] text-stone-800 border border-[#E0D8C5]">
+                            VIP Exclusive
                           </span>
                         )}
                         {job.is_remote && (
-                          <span className="px-1.5 py-0.5 text-[9px] font-bold rounded-md bg-sky-100 text-sky-800 border border-sky-200">
-                            REMOTE
+                          <span className="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-[#FAF7F0] text-stone-600 border border-[#EAE3D3]">
+                            Remote
                           </span>
                         )}
                       </div>
                     </div>
 
                     {/* Job Title */}
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                    <h3 className="text-base font-bold text-stone-900 group-hover:text-indigo-600 transition-colors line-clamp-2 leading-snug">
                       {job.title}
                     </h3>
 
-                    {/* Meta Chips */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                        <Banknote className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>{job.pay}</span>
-                      </div>
-                      <span>•</span>
-                      <div className="flex items-center gap-1 font-medium text-slate-700">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                    {/* Meta Chips in Cream/Stone */}
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      {job.pay && (
+                        <div className="font-semibold text-stone-800 bg-[#F5F0E6] px-2.5 py-1 rounded-md border border-[#E6DEC9]">
+                          {job.pay}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1 font-medium text-stone-600">
+                        <MapPin className="w-3.5 h-3.5 text-stone-400" />
                         <span className="truncate max-w-[130px]">{job.location}</span>
                       </div>
-                      <span>•</span>
-                      <span className="text-slate-500 font-medium">{job.type}</span>
+                      <span className="text-stone-300">•</span>
+                      <span className="text-stone-500 font-medium">{job.type}</span>
                     </div>
 
                     {/* Batch Eligibility if available */}
                     {job.batch && (
-                      <div className="text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-md inline-block">
+                      <div className="text-xs font-medium text-stone-700 bg-[#FAF7F0] border border-[#EBE3D3] px-2 py-0.5 rounded-md inline-block">
                         Batch {job.batch} Eligible
                       </div>
                     )}
 
-                    {/* If Direct Email Available: Display Dedicated Box */}
+                    {/* If Direct Email Available */}
                     {isEmail && rawEmail && (
                       <div 
-                        className="p-2.5 rounded-lg bg-purple-50/80 border border-purple-200 flex items-center justify-between gap-2"
+                        className="p-2.5 rounded-xl bg-[#FAF8F3] border border-[#EAE4D7] flex items-center justify-between gap-2"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center gap-1.5 truncate">
-                          <Mail className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                          <span className="text-xs font-medium text-purple-900 truncate">
+                          <Mail className="w-3.5 h-3.5 text-stone-600 shrink-0" />
+                          <span className="text-xs font-mono text-stone-800 truncate">
                             {rawEmail}
                           </span>
                         </div>
                         <button
                           onClick={(e) => copyEmail(e, job.id, rawEmail)}
-                          className="p-1 rounded hover:bg-purple-200/60 text-purple-700 transition-colors shrink-0"
+                          className="p-1 rounded-md hover:bg-[#EFE9DC] text-stone-600 transition-colors shrink-0"
                           title="Copy HR email"
                         >
                           {copiedEmailId === job.id ? (
@@ -535,51 +514,47 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                     )}
 
                     {/* Snippet */}
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">
                       {job.snippet || job.description}
                     </p>
                   </div>
 
                   {/* Action Buttons */}
                   <div 
-                    className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2"
+                    className="mt-4 pt-3 border-t border-[#EFE9DF] flex items-center justify-between gap-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {job.is_vip_exclusive && !(typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true') ? (
-                      // VIP GATED BUTTON
                       <button
                         onClick={(e) => handleApplyClick(e, job)}
-                        className="flex-1 py-2 px-3 text-xs font-bold rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 py-2 px-3 text-xs font-bold rounded-xl bg-[#1C1917] hover:bg-[#292524] text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                       >
                         <span>Unlock VIP Drop (₹75)</span>
                       </button>
                     ) : isEmail && rawEmail ? (
-                      // EMAIL HR DIRECT BUTTON
                       <a
                         href={`mailto:${rawEmail}?subject=Application for ${encodeURIComponent(job.title)} - ${encodeURIComponent(job.company)}`}
                         onClick={(e) => handleApplyClick(e, job)}
-                        className="flex-1 py-2 px-3 text-xs font-semibold rounded-lg bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl bg-[#1C1917] hover:bg-[#292524] text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                       >
                         <Mail className="w-3.5 h-3.5" />
                         <span>Send Email to HR</span>
                       </a>
                     ) : (job.apply_url || job.source_url) ? (
-                      // DIRECT EXTERNAL APPLICATION LINK
                       <a
                         href={getSafeApplyUrl(job)}
                         onClick={(e) => handleApplyClick(e, job)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 py-2 px-3 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 py-2 px-3.5 text-xs font-bold rounded-xl bg-[#4640DE] hover:bg-[#3B35C8] text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                       >
                         <span>Apply on Careers</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     ) : (
-                      // DETAILS FALLBACK
                       <button
                         onClick={() => setSelectedJob(job)}
-                        className="flex-1 py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-900 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl bg-stone-900 hover:bg-stone-800 text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                       >
                         <span>View Details</span>
                       </button>
@@ -594,7 +569,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                           window.location.hash = `job-${job.id}`;
                         }
                       }}
-                      className="py-2 px-3 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                      className="py-2 px-3 text-xs font-semibold rounded-xl bg-white hover:bg-[#FAF9F5] text-stone-700 border border-[#DDD6C9] transition-colors cursor-pointer"
                     >
                       Details
                     </button>
@@ -602,14 +577,14 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                     <button
                       type="button"
                       onClick={(e) => handleToggleBookmark(e, job)}
-                      className={`p-2 rounded-lg border transition-all cursor-pointer shrink-0 ${
+                      className={`p-2 rounded-xl border transition-all cursor-pointer shrink-0 ${
                         savedJobIds.has(job.id)
-                          ? 'bg-blue-50 border-blue-300 text-blue-600 shadow-2xs'
-                          : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-600'
+                          ? 'bg-[#F4EFE6] border-[#D8CEBA] text-stone-900 shadow-2xs'
+                          : 'bg-white hover:bg-[#FAF9F5] border-[#DDD6C9] text-stone-400 hover:text-stone-700'
                       }`}
                       title={savedJobIds.has(job.id) ? "Saved to Application Tracker" : "Save to Application Tracker"}
                     >
-                      <Bookmark className={`w-3.5 h-3.5 ${savedJobIds.has(job.id) ? 'fill-blue-600 text-blue-600' : ''}`} />
+                      <Bookmark className={`w-3.5 h-3.5 ${savedJobIds.has(job.id) ? 'fill-stone-800 text-stone-800' : ''}`} />
                     </button>
                   </div>
                 </div>
