@@ -140,3 +140,40 @@ def get_me():
         'status': 'success',
         'user': user.to_dict()
     })
+
+
+@auth_bp.route('/mcp-token', methods=['POST'])
+def generate_mcp_token():
+    """
+    POST /api/auth/mcp-token
+    Generates a 90-day personal MCP Bearer token for the logged in user.
+    """
+    user = get_current_user_from_request()
+    if not user:
+        return jsonify({'status': 'error', 'message': 'Authentication required.'}), 401
+
+    import secrets
+    from datetime import datetime, timezone, timedelta
+    from models.oauth import OAuthToken
+    from core.extensions import db
+
+    access_token = f"joborbit_at_{secrets.token_urlsafe(48)}"
+    token = OAuthToken(
+        access_token=access_token,
+        client_id="joborbit-direct",
+        user_id=user.id,
+        scope="jobs:read jobs:apply profile:read resume:read resume:write",
+        token_type="Bearer",
+        expires_at=datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=90)
+    )
+    db.session.add(token)
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'access_token': access_token,
+        'mcp_url': "https://prod-main-api-62dc70-00wtatwcawp.compute.instacloud-edge.com/mcp",
+        'sse_url': "https://prod-main-api-62dc70-00wtatwcawp.compute.instacloud-edge.com/mcp/sse",
+        'expires_in_days': 90
+    })
+

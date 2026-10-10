@@ -6,7 +6,8 @@ import {
   Bookmark,
   ExternalLink,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Bot
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -16,6 +17,7 @@ export default function Navbar({
   onOpenLegal,
   onOpenAuth,
   onOpenProfile,
+  onOpenChatGPT,
   currentUser,
   onSignOut,
   totalJobs = 13538
@@ -88,6 +90,17 @@ export default function Navbar({
 
           {/* Right: User / Auth Actions */}
           <div className="flex items-center gap-3 shrink-0">
+
+            {/* Connect ChatGPT / AI Connector Button */}
+            <button
+              onClick={onOpenChatGPT}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-200/80 bg-indigo-50/70 hover:bg-indigo-100/70 text-indigo-900 text-xs font-bold transition-all shadow-2xs cursor-pointer group"
+              title="Connect ChatGPT (MCP) or use Built-in Gemini AI"
+            >
+              <Bot className="w-3.5 h-3.5 text-indigo-600 group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline">Connect ChatGPT</span>
+              <span className="sm:hidden">AI</span>
+            </button>
             
             {currentUser ? (
               <div className="flex items-center gap-2.5">

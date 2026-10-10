@@ -21,7 +21,8 @@ import {
   Sparkles,
   Building2,
   Mail,
-  Lock
+  Lock,
+  Bot
 } from 'lucide-react';
 
 export default function LandingPage({ 
@@ -32,6 +33,7 @@ export default function LandingPage({
   onOpenVIP, 
   onOpenLegal,
   onOpenProfile,
+  onOpenChatGPT,
   onOpenJob
 }) {
   const totalJobs = stats?.stats?.total_jobs || 13538;
@@ -610,6 +612,13 @@ export default function LandingPage({
               className="px-5 py-2.5 rounded-xl bg-white text-stone-900 font-bold text-xs hover:bg-stone-100 transition-colors cursor-pointer"
             >
               Open AI Resume Studio
+            </button>
+            <button
+              onClick={onOpenChatGPT}
+              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors cursor-pointer inline-flex items-center gap-1.5"
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span>Connect ChatGPT</span>
             </button>
             <button
               onClick={onOpenVIP}

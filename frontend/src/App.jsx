@@ -19,6 +19,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AuthModal from './components/AuthModal';
 import UserProfileModal from './components/UserProfileModal';
 import ApplicationReviewModal from './components/ApplicationReviewModal';
+import ConnectChatGPTModal from './components/ConnectChatGPTModal';
 
 export default function App() {
   const getInitialView = () => {
@@ -75,6 +76,7 @@ export default function App() {
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem('joborbit_admin_token') || '');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [chatGptModalOpen, setChatGptModalOpen] = useState(false);
   const [reviewModalToken, setReviewModalToken] = useState(() => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -323,6 +325,7 @@ export default function App() {
         onOpenLegal={handleOpenLegal}
         onOpenAuth={(mode) => handleOpenAuth(mode === 'signup' ? 'Sign up to access verified applications' : '')}
         onOpenProfile={() => setProfileModalOpen(true)}
+        onOpenChatGPT={() => setChatGptModalOpen(true)}
         currentUser={currentUser}
         onSignOut={handleSignOut}
         totalJobs={stats?.stats?.total_jobs || 13538}
@@ -345,6 +348,7 @@ export default function App() {
               onOpenVIP={() => handleSetView('vip')}
               onOpenLegal={handleOpenLegal}
               onOpenProfile={() => setProfileModalOpen(true)}
+              onOpenChatGPT={() => setChatGptModalOpen(true)}
               onOpenJob={(id) => handleSetView('job-detail', id)}
             />
         ) : currentView === 'job-detail' && selectedJobId ? (
@@ -541,6 +545,15 @@ export default function App() {
         onNavigateToTracker={() => handleSetView('tracker')}
       />
 
+      {/* Connect ChatGPT & Built-in Gemini AI Modal */}
+      <ConnectChatGPTModal
+        isOpen={chatGptModalOpen}
+        onClose={() => setChatGptModalOpen(false)}
+        currentUser={currentUser}
+        onOpenAuth={(msg) => handleOpenAuth(msg)}
+        onNavigateToStudio={() => handleSetView('resume')}
+      />
+
       {/* Mandatory Human Approval Modal for ChatGPT & Portal Submissions */}
       {reviewModalToken && (
         <ApplicationReviewModal
@@ -551,6 +564,7 @@ export default function App() {
           }}
         />
       )}
+
 
     </div>
   );
