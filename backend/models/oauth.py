@@ -41,9 +41,21 @@ class OAuthClient(BaseModel):
     def check_redirect_uri(self, uri: str) -> bool:
         if not uri:
             return False
-        allowed = self.redirect_uris_json or []
-        # Support exact match or localhost for local testing
         clean_uri = uri.strip().rstrip('/')
+        
+        from urllib.parse import urlparse
+        try:
+            parsed = urlparse(clean_uri)
+            domain = (parsed.netloc or '').lower()
+            # Always permit legitimate ChatGPT, OpenAI connector, and local dev endpoints
+            if domain in ('chatgpt.com', 'chat.openai.com', 'openai.com'):
+                return True
+            if domain in ('localhost', '127.0.0.1') or domain.startswith('localhost:'):
+                return True
+        except Exception:
+            pass
+
+        allowed = self.redirect_uris_json or []
         return any(clean_uri == a.strip().rstrip('/') or clean_uri.startswith(a.strip()) for a in allowed)
 
     def to_dict(self) -> Dict[str, Any]:
