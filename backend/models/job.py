@@ -233,6 +233,14 @@ class Job(BaseModel):
             description=_clean(self.description)
         )
 
+        # VIP-exclusive gating: roles marked early access / fresh today, high compensation (>= 15 LPA), or curated batch
+        is_vip_exclusive = bool(
+            self.is_early_access or
+            is_new or
+            (self.id and self.id % 4 == 0) or
+            ('lpa' in clean_pay.lower() and any(k in clean_pay for k in ['15', '16', '18', '20', '22', '24', '25', '28', '30', '35', '40', '45', '50']))
+        )
+
         return {
             'id': self.id,
             'title': clean_title,
@@ -246,6 +254,7 @@ class Job(BaseModel):
             'is_new_today': is_new,
             'posted_date_text': 'Today' if is_new else (self.posted_date_text or 'Recently'),
             'is_early_access': is_new,
+            'is_vip_exclusive': is_vip_exclusive,
             'snippet': clean_snippet,
             'description': _clean(self.description),
             'apply_url': resolved_apply if (is_external or is_email) else None,

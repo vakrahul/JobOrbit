@@ -44,6 +44,7 @@ class JobRepository:
         location: str = '',
         remote: bool = False,
         new_today: bool = False,
+        vip_only: bool = False,
         page: int = 1,
         limit: int = 24,
     ) -> tuple[list[Job], int, int]:
@@ -89,9 +90,16 @@ class JobRepository:
                 Job.title.ilike('%remote%'),
             ))
 
-
         if new_today:
             query = query.filter(Job.is_new_today == True)
+
+        if vip_only:
+            query = query.filter(or_(
+                Job.is_early_access == True,
+                Job.is_new_today == True,
+                (Job.id % 4 == 0),
+                Job.pay.ilike('%lpa%')
+            ))
 
         total = query.count()
         global_total = self.get_total_count()

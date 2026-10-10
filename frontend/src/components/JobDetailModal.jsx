@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, MapPin, Banknote, Calendar, ExternalLink, Mail, Copy, Check, Building2, Clock, Bookmark } from 'lucide-react';
 
-export default function JobDetailModal({ job, onClose }) {
+export default function JobDetailModal({ job, onClose, currentUser, onOpenAuth, onOpenVIP }) {
   const [emailCopied, setEmailCopied] = useState(false);
   const [fullDesc, setFullDesc] = useState(job?.description || '');
   const [isSaved, setIsSaved] = useState(false);
@@ -113,6 +113,41 @@ export default function JobDetailModal({ job, onClose }) {
     }
   };
 
+  const handleApplyClick = (e) => {
+    const activeUser = currentUser || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('joborbit_user') || 'null') : null);
+    if (!activeUser) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      onClose?.();
+      onOpenAuth?.("Please create a free account or sign in to access direct verified applications.");
+      return false;
+    }
+
+    const isVip = typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true';
+    if (job?.is_vip_exclusive && !isVip) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      onClose?.();
+      alert("👑 VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
+      if (onOpenVIP) onOpenVIP();
+      else window.location.hash = 'vip';
+      return false;
+    }
+
+    if (!isVip) {
+      const count = typeof window !== 'undefined' ? parseInt(localStorage.getItem('joborbit_applied_count') || '0', 10) : 0;
+      if (count >= 5) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        onClose?.();
+        alert("⚠️ Free Trial Limit Reached (5/5 Applications Used)!\n\nDuring your free trial, accounts are limited to 5 applications.\n\nUpgrade to VIP Pass (₹75 / $9.99) for unlimited direct applications and real-time drops!");
+        if (onOpenVIP) onOpenVIP();
+        else window.location.hash = 'vip';
+        return false;
+      }
+      localStorage.setItem('joborbit_applied_count', (count + 1).toString());
+    }
+
+    return true;
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-2xl w-full my-8 overflow-hidden relative animate-in fade-in zoom-in-95 duration-200">
@@ -124,6 +159,13 @@ export default function JobDetailModal({ job, onClose }) {
               <span className="font-semibold text-sm text-blue-600">
                 {job.company}
               </span>
+
+              {/* VIP Badge */}
+              {job.is_vip_exclusive && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-black rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-2xs">
+                  <span>👑 VIP Exclusive Drop</span>
+                </span>
+              )}
 
               {/* Source Badge */}
               {job.source_platform ? (
@@ -185,6 +227,8 @@ export default function JobDetailModal({ job, onClose }) {
 
             <button
               onClick={() => {
+                if (!handleApplyClick()) return;
+
                 // Resolve the best external URL to open — prefer direct apply URL, then external source_url
                 const externalTarget =
                   (job.is_external_apply && job.apply_url) ||
@@ -404,6 +448,7 @@ export default function JobDetailModal({ job, onClose }) {
 
                     <a
                       href={`mailto:${rawEmail}?subject=Application for ${encodeURIComponent(job.title)} - ${encodeURIComponent(job.company)}`}
+                      onClick={(e) => handleApplyClick(e)}
                       className="w-full py-3 px-4 rounded-xl text-sm font-semibold bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Mail className="w-4 h-4" />
@@ -418,6 +463,8 @@ export default function JobDetailModal({ job, onClose }) {
                 applyUrl = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(((job.company || '') + ' ' + (job.title || '')).trim())}`;
               }
 
+              const isUserVip = typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true';
+
               return (
                 <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
@@ -430,9 +477,17 @@ export default function JobDetailModal({ job, onClose }) {
                     <Building2 className="w-6 h-6 text-slate-400" />
                   </div>
 
-                  {applyUrl ? (
+                  {job.is_vip_exclusive && !isUserVip ? (
+                    <button
+                      onClick={(e) => handleApplyClick(e)}
+                      className="w-full py-3 px-4 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <span>👑 Unlock VIP Drop with VIP Pass (₹75)</span>
+                    </button>
+                  ) : applyUrl ? (
                     <a
                       href={applyUrl}
+                      onClick={(e) => handleApplyClick(e)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full py-3 px-4 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"

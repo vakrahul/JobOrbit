@@ -19,7 +19,8 @@ export default function AuthModal({
   isOpen, 
   onClose, 
   onSuccess,
-  defaultTab = 'login' 
+  defaultTab = 'login',
+  promptMessage = ''
 }) {
   const [tab, setTab] = useState(defaultTab); // 'login' | 'signup'
   const [email, setEmail] = useState('');
@@ -160,6 +161,14 @@ export default function AuthModal({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Action Prompt Banner if gated */}
+        {promptMessage && (
+          <div className="mx-6 mt-4 p-3 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
+            <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+            <p className="leading-snug">{promptMessage}</p>
+          </div>
+        )}
 
         {/* Tab Toggle Switcher */}
         <div className="px-6 pt-4">

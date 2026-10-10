@@ -64,6 +64,7 @@ try:
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/124.0.0.0 Safari/537.36 JobOrbitAggregator/2.0"
         )
+        CAREERLIFT_COOKIE: Optional[str] = None
 
         # ── Scheduler ─────────────────────────────────────────────────────────
         SYNC_INTERVAL_HOURS: int = 3
@@ -100,12 +101,15 @@ try:
 
         @property
         def scraper_headers(self) -> dict:
-            return {
+            h = {
                 "User-Agent": self.SCRAPER_USER_AGENT,
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.9",
                 "Cache-Control": "no-cache",
             }
+            if self.CAREERLIFT_COOKIE:
+                h["Cookie"] = self.CAREERLIFT_COOKIE
+            return h
 
         @property
         def cache_config(self) -> dict:
@@ -160,6 +164,7 @@ except ImportError:
             "SCRAPER_USER_AGENT",
             "Mozilla/5.0 JobOrbitAggregator/2.0"
         )
+        CAREERLIFT_COOKIE = os.getenv("CAREERLIFT_COOKIE")
         SYNC_INTERVAL_HOURS = int(os.getenv("SYNC_INTERVAL_HOURS", "3"))
         EKQR_API_KEY = os.getenv("EKQR_API_KEY")
         CASHFREE_APP_ID = os.getenv("CASHFREE_APP_ID")
@@ -184,12 +189,15 @@ except ImportError:
 
         @property
         def scraper_headers(self):
-            return {
+            h = {
                 "User-Agent": self.SCRAPER_USER_AGENT,
                 "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.9",
                 "Cache-Control": "no-cache",
             }
+            if self.CAREERLIFT_COOKIE:
+                h["Cookie"] = self.CAREERLIFT_COOKIE
+            return h
 
         @property
         def cache_config(self):

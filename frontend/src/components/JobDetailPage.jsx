@@ -45,7 +45,7 @@ export function getSafeApplyUrl(job) {
   return raw;
 }
 
-export default function JobDetailPage({ jobId, onBack }) {
+export default function JobDetailPage({ jobId, onBack, currentUser, onOpenAuth, onOpenVIP }) {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -136,18 +136,36 @@ export default function JobDetailPage({ jobId, onBack }) {
     }
   };
 
-  const handleTrackApplication = (e) => {
-    const isVip = typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true';
-    if (isVip) return;
-
-    const count = typeof window !== 'undefined' ? parseInt(localStorage.getItem('joborbit_applied_count') || '0', 10) : 0;
-    if (count >= 5) {
-      e.preventDefault();
-      alert("⚠️ Free Trial Limit Reached (5/5 Applications Used)!\n\nDuring your 5-day trial, free accounts are limited to 5 applications.\n\nUpgrade to VIP Pass (₹75 / $9.99) for unlimited direct applications, 5-hour real-time drops, and unlocked recruiter corporate emails!");
-      window.location.hash = 'vip';
-      return;
+  const handleApplyClick = (e) => {
+    const activeUser = currentUser || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('joborbit_user') || 'null') : null);
+    if (!activeUser) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      onOpenAuth?.("Please create a free account or sign in to access direct verified applications.");
+      return false;
     }
-    localStorage.setItem('joborbit_applied_count', (count + 1).toString());
+
+    const isVip = typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true';
+    if (job?.is_vip_exclusive && !isVip) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      alert("👑 VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
+      if (onOpenVIP) onOpenVIP();
+      else window.location.hash = 'vip';
+      return false;
+    }
+
+    if (!isVip) {
+      const count = typeof window !== 'undefined' ? parseInt(localStorage.getItem('joborbit_applied_count') || '0', 10) : 0;
+      if (count >= 5) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        alert("⚠️ Free Trial Limit Reached (5/5 Applications Used)!\n\nDuring your 5-day trial, free accounts are limited to 5 applications.\n\nUpgrade to VIP Pass (₹75 / $9.99) for unlimited direct applications, 5-hour real-time drops, and unlocked recruiter corporate emails!");
+        if (onOpenVIP) onOpenVIP();
+        else window.location.hash = 'vip';
+        return false;
+      }
+      localStorage.setItem('joborbit_applied_count', (count + 1).toString());
+    }
+
+    return true;
   };
 
   const handleEvaluateFit = async () => {
@@ -329,6 +347,11 @@ export default function JobDetailPage({ jobId, onBack }) {
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 Verified Opportunity
               </span>
+              {job.is_vip_exclusive && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-extrabold shadow-2xs">
+                  <span>👑 VIP Drop</span>
+                </span>
+              )}
               {job.is_new_today && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-800 font-bold">
                   <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -375,10 +398,17 @@ export default function JobDetailPage({ jobId, onBack }) {
               <span>{copiedLink ? 'Link Copied!' : 'Share'}</span>
             </button>
 
-            {job.apply_url ? (
+            {job.is_vip_exclusive && !(typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true') ? (
+              <button
+                onClick={(e) => handleApplyClick(e)}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              >
+                <span>👑 Unlock VIP Drop with VIP Pass (₹75)</span>
+              </button>
+            ) : job.apply_url ? (
               <a
                 href={getSafeApplyUrl(job)}
-                onClick={handleTrackApplication}
+                onClick={(e) => handleApplyClick(e)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
@@ -389,7 +419,7 @@ export default function JobDetailPage({ jobId, onBack }) {
             ) : job.is_email_apply ? (
               <a
                 href={`mailto:${job.email_recipient}?subject=Application: ${encodeURIComponent(job.title)}`}
-                onClick={handleTrackApplication}
+                onClick={(e) => handleApplyClick(e)}
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
                 <Mail className="w-4 h-4" />
@@ -398,7 +428,7 @@ export default function JobDetailPage({ jobId, onBack }) {
             ) : (job.apply_url || job.source_url) ? (
               <a
                 href={getSafeApplyUrl(job)}
-                onClick={handleTrackApplication}
+                onClick={(e) => handleApplyClick(e)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
@@ -408,7 +438,7 @@ export default function JobDetailPage({ jobId, onBack }) {
               </a>
             ) : (
               <button
-                onClick={() => setApplyModalOpen(true)}
+                onClick={(e) => { if (handleApplyClick(e)) setApplyModalOpen(true); }}
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
                 <span>View Job Details</span>
@@ -590,14 +620,26 @@ export default function JobDetailPage({ jobId, onBack }) {
               Apply to {job.company}
             </h3>
 
-            {job.apply_url ? (
+            {job.is_vip_exclusive && !(typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true') ? (
+              <div className="space-y-3">
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  👑 <strong>VIP Exclusive Drop:</strong> This high-demand role requires JobOrbit VIP Access (₹75/mo) to unlock direct ATS application links and recruiter contacts.
+                </p>
+                <button
+                  onClick={(e) => handleApplyClick(e)}
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer text-center"
+                >
+                  <span>👑 Unlock VIP Drop (₹75)</span>
+                </button>
+              </div>
+            ) : job.apply_url ? (
               <div className="space-y-3">
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Applications are accepted directly through {job.company}'s official career site. Click below to launch the employer's official form.
                 </p>
                 <a
                   href={getSafeApplyUrl(job)}
-                  onClick={handleTrackApplication}
+                  onClick={(e) => handleApplyClick(e)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer text-center"
@@ -624,6 +666,7 @@ export default function JobDetailPage({ jobId, onBack }) {
                 </div>
                 <a
                   href={`mailto:${job.email_recipient}?subject=Application: ${encodeURIComponent(job.title)}`}
+                  onClick={(e) => handleApplyClick(e)}
                   className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer text-center"
                 >
                   <Mail className="w-4 h-4" />
@@ -632,7 +675,7 @@ export default function JobDetailPage({ jobId, onBack }) {
               </div>
             ) : (
               <button
-                onClick={() => setApplyModalOpen(true)}
+                onClick={(e) => { if (handleApplyClick(e)) setApplyModalOpen(true); }}
                 className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
               >
                 <span>Submit Quick Application</span>

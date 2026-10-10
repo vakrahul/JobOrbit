@@ -72,6 +72,7 @@ export default function App() {
   const [legalModalTab, setLegalModalTab] = useState('terms');
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem('joborbit_admin_token') || '');
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authPromptMessage, setAuthPromptMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('joborbit_user');
@@ -80,6 +81,11 @@ export default function App() {
       return null;
     }
   });
+
+  const handleOpenAuth = (msg = '') => {
+    setAuthPromptMessage(msg);
+    setAuthModalOpen(true);
+  };
 
   const handleSignOut = () => {
     localStorage.removeItem('joborbit_user_token');
@@ -219,7 +225,7 @@ export default function App() {
         setCurrentView={handleSetView}
         onOpenVIP={() => handleSetView('vip')}
         onOpenLegal={handleOpenLegal}
-        onOpenAuth={() => setAuthModalOpen(true)}
+        onOpenAuth={() => handleOpenAuth('')}
         currentUser={currentUser}
         onSignOut={handleSignOut}
         totalJobs={stats?.stats?.total_jobs || 13259}
@@ -246,6 +252,9 @@ export default function App() {
           <JobDetailPage
             jobId={selectedJobId}
             onBack={() => handleSetView('public')}
+            currentUser={currentUser}
+            onOpenAuth={handleOpenAuth}
+            onOpenVIP={() => setVipModalOpen(true)}
           />
         ) : currentView === 'resume' ? (
           <ResumeStudio />
@@ -301,7 +310,9 @@ export default function App() {
           <MainPage
             onGoToAdmin={() => handleSetView('admin')}
             onOpenJob={(id) => handleSetView('job-detail', id)}
-            onOpenVIP={() => handleSetView('vip')}
+            onOpenVIP={() => setVipModalOpen(true)}
+            onOpenAuth={handleOpenAuth}
+            currentUser={currentUser}
             stats={stats}
           />
         )}
@@ -405,7 +416,11 @@ export default function App() {
       {/* Global Authentication Modal (Login / Sign Up / Google OAuth) */}
       <AuthModal
         isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
+        onClose={() => {
+          setAuthModalOpen(false);
+          setAuthPromptMessage('');
+        }}
+        promptMessage={authPromptMessage}
         onSuccess={(user) => setCurrentUser(user)}
       />
 

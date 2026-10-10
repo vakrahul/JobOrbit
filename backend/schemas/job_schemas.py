@@ -20,6 +20,7 @@ class JobSearchSchema(Schema):
     location = fields.Str(load_default='')
     remote = fields.Bool(load_default=False)
     new_today = fields.Bool(load_default=False)
+    vip_only = fields.Bool(load_default=False)
     page = fields.Int(load_default=1, validate=validate.Range(min=1, max=1000))
     limit = fields.Int(load_default=24, validate=validate.Range(min=1, max=100))
 

@@ -37,6 +37,7 @@ class JobService:
             location=filters.get('location', ''),
             remote=str(filters.get('remote', '')).lower() == 'true',
             new_today=str(filters.get('new_today', '')).lower() == 'true',
+            vip_only=str(filters.get('vip_only', '')).lower() == 'true',
             page=page,
             limit=limit,
         )
