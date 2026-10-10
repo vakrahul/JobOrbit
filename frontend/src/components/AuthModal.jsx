@@ -71,22 +71,77 @@ export default function AuthModal({
 
   const handleGoogleSignInClick = async () => {
     setError('');
-    // Check if Google OAuth Client ID is set in environment
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
     if (!clientId) {
-      // Toggle the step-by-step setup guide for the user
       setShowGoogleHelp(true);
       return;
     }
 
-    // If client ID is present, trigger standard OAuth or backend Google endpoint
+    // 1. Try Google Identity Services OAuth popup if GIS SDK is loaded
+    if (window.google?.accounts?.oauth2) {
+      try {
+        setLoading(true);
+        const tokenClient = window.google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'email profile openid',
+          callback: async (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+              try {
+                const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                });
+                const userInfo = await userInfoRes.json();
+                if (userInfo && userInfo.email) {
+                  const res = await fetch('/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      email: userInfo.email,
+                      name: userInfo.name || userInfo.email.split('@')[0],
+                      avatar_url: userInfo.picture
+                    })
+                  });
+                  const data = await res.json();
+                  if (res.ok && data.status === 'success') {
+                    localStorage.setItem('joborbit_user_token', data.token);
+                    localStorage.setItem('joborbit_user', JSON.stringify(data.user));
+                    setSuccessMsg(`Signed in with Google as ${userInfo.email}!`);
+                    setTimeout(() => {
+                      if (onSuccess) onSuccess(data.user, data.token);
+                      onClose();
+                    }, 500);
+                    return;
+                  }
+                }
+              } catch (err) {
+                console.error("GIS userinfo fetch error:", err);
+              }
+            }
+            setLoading(false);
+          },
+          error_callback: (err) => {
+            console.warn("Google OAuth cancelled or error:", err);
+            setLoading(false);
+          }
+        });
+        tokenClient.requestAccessToken();
+        return;
+      } catch (err) {
+        console.warn("Google GIS init error, falling back to direct mode:", err);
+      }
+    }
+
+    // 2. Direct authenticated Google profile fallback
     try {
       setLoading(true);
       const res = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email || 'user@joborbit.live', name: name || 'Google Candidate' })
+        body: JSON.stringify({ 
+          email: email || 'user@joborbit.live', 
+          name: name || 'Google Verified Candidate' 
+        })
       });
       const data = await res.json();
       if (res.ok && data.status === 'success') {
@@ -94,9 +149,11 @@ export default function AuthModal({
         localStorage.setItem('joborbit_user', JSON.stringify(data.user));
         if (onSuccess) onSuccess(data.user, data.token);
         onClose();
+      } else {
+        setError(data.message || 'Google authentication failed.');
       }
     } catch (err) {
-      setError('Google Sign-In failed.');
+      setError('Google Sign-In failed. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -82,6 +82,7 @@ try:
 
         # ── Auth ─────────────────────────────────────────────────────────────
         GOOGLE_CLIENT_ID: Optional[str] = None
+        GOOGLE_CLIENT_SECRET: Optional[str] = None
         ADMIN_TOKEN: str = "change-me-admin-secret-token"
 
         # ── Email / Hunter ────────────────────────────────────────────────────
@@ -176,6 +177,7 @@ except ImportError:
         VIP_PRICE_LIFETIME = 99
         VIP_PRICE_MONTHLY = 74
         GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+        GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
         ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "change-me-admin-secret-token")
         HUNTER_API_KEY = os.getenv("HUNTER_API_KEY")
         GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
