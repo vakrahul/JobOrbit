@@ -6,6 +6,18 @@ from models.hr import HRContact, generate_hr_dedupe_key
 from models.research import ProfessorContact
 from models.prep import PrepQuestion
 from models.audit import ScrapeLog
+from models.application import (
+    ApplicationDraft,
+    ApplicationApproval,
+    SubmissionAttempt,
+    AuditEvent,
+    compute_application_hash,
+)
+from models.oauth import (
+    OAuthClient,
+    OAuthAuthorizationCode,
+    OAuthToken,
+)
 
 __all__ = [
     "db",
@@ -21,4 +33,13 @@ __all__ = [
     "ProfessorContact",
     "PrepQuestion",
     "ScrapeLog",
+    "ApplicationDraft",
+    "ApplicationApproval",
+    "SubmissionAttempt",
+    "AuditEvent",
+    "compute_application_hash",
+    "OAuthClient",
+    "OAuthAuthorizationCode",
+    "OAuthToken",
 ]
+

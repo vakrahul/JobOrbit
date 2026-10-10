@@ -1486,45 +1486,65 @@ export default function ResumeStudio() {
                 backgroundColor: '#ffffff'
               }}
             >
-              {/* Header: Exact Image 2 format */}
-              <div className="text-center pb-1 mb-2">
-                <h1 className="text-[22pt] font-bold text-black tracking-tight leading-none mb-1 text-center">
-                  {resumeData.basics.name}
-                </h1>
-                <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9pt] text-black leading-normal">
-                  {resumeData.basics.portfolio && (
-                    <a 
-                      href={`https://${resumeData.basics.portfolio.replace(/^https?:\/\//, '').replace(/\/$/, '')}/`} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="text-black hover:underline"
-                    >
-                      {resumeData.basics.portfolio.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                    </a>
+              {/* Header: Professional layout with optional photo */}
+              <div className="pb-1 mb-2">
+                <div className={`flex items-center gap-4 ${resumeData.basics.showPhoto && resumeData.basics.photo ? 'justify-between' : 'justify-center'}`}>
+                  {resumeData.basics.showPhoto && resumeData.basics.photo && (
+                    <div className="shrink-0">
+                      <img 
+                        src={resumeData.basics.photo} 
+                        alt={resumeData.basics.name}
+                        className={`w-20 h-20 object-cover border border-slate-400/60 shadow-xs ${
+                          resumeData.basics.photoShape === 'circle' ? 'rounded-full' :
+                          resumeData.basics.photoShape === 'rounded' ? 'rounded-xl' : 'rounded-none'
+                        }`}
+                      />
+                    </div>
                   )}
-                  {resumeData.basics.phone && <span>| {resumeData.basics.phone}</span>}
-                  {resumeData.basics.email && (
-                    <span>| <a href={`mailto:${resumeData.basics.email}`} className="text-black hover:underline">{resumeData.basics.email}</a></span>
-                  )}
-                  {resumeData.basics.linkedin && (
-                    <span>| <a 
-                      href={`https://${resumeData.basics.linkedin.replace(/^https?:\/\//, '').replace(/\/$/, '')}`} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="text-black hover:underline"
-                    >
-                      {resumeData.basics.linkedin.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                    </a></span>
-                  )}
-                  {resumeData.basics.github && (
-                    <span>| <a 
-                      href={`https://${resumeData.basics.github.replace(/^https?:\/\//, '').replace(/\/$/, '')}`} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="text-black hover:underline"
-                    >
-                      {resumeData.basics.github.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                    </a></span>
+                  <div className="flex-1 text-center">
+                    <h1 className="text-[22pt] font-bold text-black tracking-tight leading-none mb-1 text-center">
+                      {resumeData.basics.name}
+                    </h1>
+                    <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9pt] text-black leading-normal">
+                      {resumeData.basics.portfolio && (
+                        <a 
+                          href={`https://${resumeData.basics.portfolio.replace(/^https?:\/\//, '').replace(/\/$/, '')}/`} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="text-black hover:underline"
+                        >
+                          {resumeData.basics.portfolio.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                        </a>
+                      )}
+                      {resumeData.basics.phone && <span>| {resumeData.basics.phone}</span>}
+                      {resumeData.basics.email && (
+                        <span>| <a href={`mailto:${resumeData.basics.email}`} className="text-black hover:underline">{resumeData.basics.email}</a></span>
+                      )}
+                      {resumeData.basics.linkedin && (
+                        <span>| <a 
+                          href={`https://${resumeData.basics.linkedin.replace(/^https?:\/\//, '').replace(/\/$/, '')}`} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="text-black hover:underline"
+                        >
+                          {resumeData.basics.linkedin.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                        </a></span>
+                      )}
+                      {resumeData.basics.github && (
+                        <span>| <a 
+                          href={`https://${resumeData.basics.github.replace(/^https?:\/\//, '').replace(/\/$/, '')}`} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="text-black hover:underline"
+                        >
+                          {resumeData.basics.github.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                        </a></span>
+                      )}
+                    </div>
+                  </div>
+                  {/* Invisible spacer to maintain symmetry when photo is shown on left */}
+                  {resumeData.basics.showPhoto && resumeData.basics.photo && (
+                    <div className="w-20 hidden md:block shrink-0 pointer-events-none" aria-hidden="true" />
                   )}
                 </div>
               </div>

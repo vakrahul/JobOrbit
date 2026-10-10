@@ -18,6 +18,7 @@ import AuditAgent from './components/AuditAgent';
 import ErrorBoundary from './components/ErrorBoundary';
 import AuthModal from './components/AuthModal';
 import UserProfileModal from './components/UserProfileModal';
+import ApplicationReviewModal from './components/ApplicationReviewModal';
 
 export default function App() {
   const getInitialView = () => {
@@ -74,6 +75,14 @@ export default function App() {
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem('joborbit_admin_token') || '');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [reviewModalToken, setReviewModalToken] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('token') || null;
+    } catch {
+      return null;
+    }
+  });
   const [authPromptMessage, setAuthPromptMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -531,6 +540,17 @@ export default function App() {
         onOpenVIP={() => setVipModalOpen(true)}
         onNavigateToTracker={() => handleSetView('tracker')}
       />
+
+      {/* Mandatory Human Approval Modal for ChatGPT & Portal Submissions */}
+      {reviewModalToken && (
+        <ApplicationReviewModal
+          approvalToken={reviewModalToken}
+          onClose={() => setReviewModalToken(null)}
+          onActionSuccess={(data) => {
+            console.log("Approval status updated:", data);
+          }}
+        />
+      )}
 
     </div>
   );

@@ -50,14 +50,16 @@ class UserRepository:
         db.session.commit()
         return user
 
-    def authenticate_with_password(self, email: str, password: str) -> Optional[User]:
+    def verify_password(self, user: User, password: str) -> bool:
         from werkzeug.security import check_password_hash
-        user = self.get_by_email(email)
         if not user or not user.password_hash:
-            return None
-        if check_password_hash(user.password_hash, password):
-            return user
-        return None
+            return False
+        return check_password_hash(user.password_hash, password)
+
+    def set_user_password(self, user: User, password: str) -> None:
+        from werkzeug.security import generate_password_hash
+        user.password_hash = generate_password_hash(password)
+        db.session.commit()
 
     def create_or_update_google_user(self, email: str, name: str, avatar_url: str) -> User:
         user = self.get_by_email(email)

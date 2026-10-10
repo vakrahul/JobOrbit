@@ -23,6 +23,10 @@ class User(BaseModel):
 
     saved_jobs = db.relationship('SavedJob', backref='user', lazy='dynamic', cascade='all, delete-orphan')
 
+    @property
+    def full_name(self) -> str:
+        return self.name or ''
+
     def to_dict(self) -> dict:
         return {
             'id': self.id,

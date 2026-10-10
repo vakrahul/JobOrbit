@@ -51,6 +51,9 @@ class AuthError(AppError):
     error_code = "UNAUTHORIZED"
 
 
+UnauthorizedError = AuthError
+
+
 class InvalidTokenError(AuthError):
     error_code = "INVALID_TOKEN"
 

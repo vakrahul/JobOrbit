@@ -35,16 +35,16 @@ def create_app(test_config=None):
         abs_path = os.path.join(base_dir, db_url[10:])
         db_url = f'sqlite:///{abs_path}'
 
-    engine_options = {
-        'pool_recycle': settings.SQLALCHEMY_POOL_RECYCLE,
-        'pool_timeout': settings.SQLALCHEMY_POOL_TIMEOUT,
-        'pool_pre_ping': True,
-    }
-    if not db_url.startswith('sqlite'):
-        engine_options.update({
+    if db_url.startswith('sqlite'):
+        engine_options = {}
+    else:
+        engine_options = {
+            'pool_recycle': settings.SQLALCHEMY_POOL_RECYCLE,
+            'pool_timeout': settings.SQLALCHEMY_POOL_TIMEOUT,
+            'pool_pre_ping': True,
             'pool_size': settings.SQLALCHEMY_POOL_SIZE,
             'max_overflow': settings.SQLALCHEMY_MAX_OVERFLOW,
-        })
+        }
 
     app.config.update({
         'SECRET_KEY': settings.SECRET_KEY,
@@ -70,7 +70,12 @@ def create_app(test_config=None):
 
     CORS(
         app,
-        resources={r"/api/*": {"origins": settings.cors_origins_list}},
+        resources={
+            r"/api/*": {"origins": settings.cors_origins_list},
+            r"/mcp*": {"origins": "*"},
+            r"/oauth/*": {"origins": "*"},
+            r"/.well-known/*": {"origins": "*"},
+        },
         supports_credentials=True,
     )
 
@@ -91,6 +96,8 @@ def create_app(test_config=None):
         from models.research import ProfessorContact
         from models.prep import PrepQuestion
         from models.audit import ScrapeLog
+        from models.application import ApplicationDraft, ApplicationApproval, SubmissionAttempt, AuditEvent
+        from models.oauth import OAuthClient, OAuthAuthorizationCode, OAuthToken
         db.create_all()
 
     # ── Register Blueprints ───────────────────────────────────────────────────
@@ -104,6 +111,9 @@ def create_app(test_config=None):
     from routes.ai import ai_bp
     from routes.tracker import tracker_bp
     from routes.resume import resume_bp
+    from routes.oauth_routes import oauth_bp
+    from routes.mcp_routes import mcp_bp
+    from routes.application_routes import applications_bp
 
     app.register_blueprint(admin_bp)
     app.register_blueprint(jobs_bp)
@@ -115,6 +125,9 @@ def create_app(test_config=None):
     app.register_blueprint(ai_bp)
     app.register_blueprint(tracker_bp)
     app.register_blueprint(resume_bp)
+    app.register_blueprint(oauth_bp)
+    app.register_blueprint(mcp_bp)
+    app.register_blueprint(applications_bp)
 
     # ── Global Error Handlers ────────────────────────────────────────────────
     @app.errorhandler(AppError)
