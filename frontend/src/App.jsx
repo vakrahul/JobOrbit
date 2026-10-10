@@ -108,6 +108,52 @@ export default function App() {
     };
   }, []);
 
+  // Catch Google OAuth redirect token from window.location.hash
+  useEffect(() => {
+    const handleGoogleHashToken = async () => {
+      const hash = window.location.hash || '';
+      if (hash.includes('access_token=')) {
+        try {
+          const params = new URLSearchParams(hash.replace(/^#/, ''));
+          const accessToken = params.get('access_token');
+          if (accessToken) {
+            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            const userInfo = await userInfoRes.json();
+            if (userInfo && userInfo.email) {
+              const res = await fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: userInfo.email,
+                  name: userInfo.name || userInfo.email.split('@')[0],
+                  avatar_url: userInfo.picture
+                })
+              });
+              const data = await res.json();
+              if (res.ok && data.status === 'success') {
+                localStorage.setItem('joborbit_user_token', data.token);
+                localStorage.setItem('joborbit_user', JSON.stringify(data.user));
+                setCurrentUser(data.user);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Google OAuth token redirect handling error:", err);
+        } finally {
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname || '/');
+          } else {
+            window.location.hash = '';
+          }
+        }
+      }
+    };
+
+    handleGoogleHashToken();
+  }, []);
+
   const handleOpenLegal = (tab = 'terms') => {
     setLegalModalTab(tab);
     setLegalModalOpen(true);

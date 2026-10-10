@@ -70,12 +70,8 @@ export default function AuthModal({
 
   const handleGoogleSignInClick = async () => {
     setError('');
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-    if (!clientId) {
-      setError('Google Sign-In is initializing. Please try email or refresh.');
-      return;
-    }
+    // Client ID with fallback guarantee so Cloudflare builds always succeed
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '277256457988-b7emm3i2lp76jheftii4t3ijfs5igpb8.apps.googleusercontent.com';
 
     // 1. Try Google Identity Services OAuth popup if GIS SDK is loaded
     if (window.google?.accounts?.oauth2) {
@@ -124,36 +120,20 @@ export default function AuthModal({
             setLoading(false);
           }
         });
-        tokenClient.requestAccessToken();
+        tokenClient.requestAccessToken({ prompt: 'select_account' });
         return;
       } catch (err) {
-        console.warn("Google GIS init error, falling back to direct mode:", err);
+        console.warn("Google GIS init error, falling back to direct redirect:", err);
       }
     }
 
-    // 2. Direct authenticated Google profile fallback
+    // 2. Direct Google OAuth redirect if popup SDK is not ready yet
     try {
-      setLoading(true);
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: email || 'user@joborbit.live', 
-          name: name || 'Google Verified Candidate' 
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.status === 'success') {
-        localStorage.setItem('joborbit_user_token', data.token);
-        localStorage.setItem('joborbit_user', JSON.stringify(data.user));
-        if (onSuccess) onSuccess(data.user, data.token);
-        onClose();
-      } else {
-        setError(data.message || 'Google authentication failed.');
-      }
+      const redirectUri = window.location.origin;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=email%20profile%20openid&prompt=select_account`;
+      window.location.href = authUrl;
     } catch (err) {
-      setError('Google Sign-In failed. Please try again.');
-    } finally {
+      setError('Unable to launch Google Sign-In. Please sign in with email.');
       setLoading(false);
     }
   };
