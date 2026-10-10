@@ -29,7 +29,6 @@ export default function AuthModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [showGoogleHelp, setShowGoogleHelp] = useState(false);
 
   if (!isOpen) return null;
 
@@ -74,7 +73,7 @@ export default function AuthModal({
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
     if (!clientId) {
-      setShowGoogleHelp(true);
+      setError('Google Sign-In is initializing. Please try email or refresh.');
       return;
     }
 
@@ -154,36 +153,6 @@ export default function AuthModal({
       }
     } catch (err) {
       setError('Google Sign-In failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTestGoogleDemo = async () => {
-    setLoading(true);
-    try {
-      const demoEmail = email && email.includes('@') ? email : 'demo.candidate@joborbit.live';
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: demoEmail, 
-          name: name || 'Google Verified Candidate',
-          avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${demoEmail}`
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.status === 'success') {
-        localStorage.setItem('joborbit_user_token', data.token);
-        localStorage.setItem('joborbit_user', JSON.stringify(data.user));
-        setSuccessMsg(`Authenticated as ${demoEmail} via Google OAuth Provider!`);
-        setTimeout(() => {
-          if (onSuccess) onSuccess(data.user, data.token);
-          onClose();
-        }, 700);
-      }
-    } catch (e) {
-      setError('Google authentication test failed.');
     } finally {
       setLoading(false);
     }
@@ -282,39 +251,6 @@ export default function AuthModal({
               <span>Continue with Google</span>
             </button>
           </div>
-
-          {/* Google OAuth Steps Guide (Expands if clicked) */}
-          {showGoogleHelp && (
-            <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-xs space-y-3">
-              <div className="flex items-center justify-between text-blue-900 font-bold">
-                <span className="flex items-center gap-1.5">
-                  <Key className="w-4 h-4 text-blue-600" />
-                  <span>Google OAuth Setup Steps for joborbit.live</span>
-                </span>
-                <button 
-                  onClick={() => setShowGoogleHelp(false)}
-                  className="text-blue-500 hover:text-blue-700"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <ol className="list-decimal pl-4 space-y-1.5 text-slate-700 leading-relaxed text-[11px]">
-                <li>Go to <strong className="text-slate-900">console.cloud.google.com</strong> &bull; Create project.</li>
-                <li>Under <strong>APIs &amp; Services &gt; Credentials</strong>, click <strong>Create Credentials &gt; OAuth Client ID</strong> (Web application).</li>
-                <li>Add Authorized JavaScript Origin: <code className="bg-white px-1 py-0.5 rounded border border-blue-200 text-blue-800">https://joborbit.live</code> (and <code className="bg-white px-1 py-0.5 rounded border border-blue-200 text-blue-800">http://localhost:5173</code> for local).</li>
-                <li>Add Authorized Redirect URI: <code className="bg-white px-1 py-0.5 rounded border border-blue-200 text-blue-800">https://joborbit.live</code>.</li>
-                <li>Copy your <strong>Client ID</strong> into <code className="bg-white px-1 py-0.5 rounded border border-blue-200 font-mono">frontend/.env</code> as: <code className="bg-white px-1 py-0.5 rounded border border-blue-200 font-mono text-blue-900">VITE_GOOGLE_CLIENT_ID=your_id.apps.googleusercontent.com</code></li>
-              </ol>
-
-              <button
-                type="button"
-                onClick={handleTestGoogleDemo}
-                className="w-full py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-colors cursor-pointer"
-              >
-                Test Authenticate With Google Now (Direct Mode)
-              </button>
-            </div>
-          )}
 
           {/* Divider */}
           <div className="relative flex items-center justify-center">

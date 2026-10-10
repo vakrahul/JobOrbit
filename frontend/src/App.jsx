@@ -330,30 +330,24 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           
           {/* Main Navigation Links */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-slate-600">
-            <button onClick={() => handleSetView('landing')} className="hover:text-blue-600 cursor-pointer">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-medium text-stone-600">
+            <button onClick={() => handleSetView('landing')} className="hover:text-stone-900 cursor-pointer">
               Home
             </button>
-            <button onClick={() => handleSetView('public')} className="hover:text-blue-600 cursor-pointer">
-              Explore Jobs ({stats?.stats?.total_jobs?.toLocaleString() || '13,259'})
+            <button onClick={() => handleSetView('public')} className="hover:text-stone-900 cursor-pointer">
+              Find Jobs ({stats?.stats?.total_jobs?.toLocaleString() || '13,538'})
             </button>
-            <button onClick={() => handleSetView('audit')} className="hover:text-blue-600 cursor-pointer text-indigo-600 font-bold">
-              AI Audit Agent
+            <button onClick={() => handleSetView('hr')} className="hover:text-stone-900 cursor-pointer">
+              Companies &amp; HR Inboxes
             </button>
-            <button onClick={() => handleSetView('resume')} className="hover:text-blue-600 cursor-pointer">
+            <button onClick={() => handleSetView('resume')} className="hover:text-stone-900 cursor-pointer">
               Resume Studio
             </button>
-            <button onClick={() => handleSetView('research')} className="hover:text-blue-600 cursor-pointer">
-              Research Labs (290+)
-            </button>
-            <button onClick={() => handleSetView('hr')} className="hover:text-blue-600 cursor-pointer">
-              HR Recruiter Leads
-            </button>
-            <button onClick={() => handleSetView('tracker')} className="hover:text-blue-600 cursor-pointer">
+            <button onClick={() => handleSetView('tracker')} className="hover:text-stone-900 cursor-pointer">
               Application Tracker
             </button>
-            <button onClick={() => handleSetView('vip')} className="text-amber-600 font-bold hover:underline cursor-pointer">
-              VIP Pass (₹75 / $9.99)
+            <button onClick={() => handleSetView('vip')} className="text-amber-800 font-bold hover:underline cursor-pointer">
+              VIP Pass (₹75)
             </button>
           </div>
 

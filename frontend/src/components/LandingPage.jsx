@@ -592,7 +592,7 @@ export default function LandingPage({
         <div className="max-w-2xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white border border-white/20">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span>AI Resume Studio &amp; Profile Audit</span>
+            <span>Autonomous AI Resume Studio</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-black tracking-tight leading-snug">
@@ -601,7 +601,7 @@ export default function LandingPage({
           </h2>
 
           <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
-            Generate ATS-compliant single-page LaTeX PDF resumes, detect keyword gaps, and unlock cold outreach recruiter emails.
+            Generate ATS-compliant single-page LaTeX PDF resumes, align critical tech keywords, and unlock cold outreach recruiter emails.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -610,12 +610,6 @@ export default function LandingPage({
               className="px-5 py-2.5 rounded-xl bg-white text-stone-900 font-bold text-xs hover:bg-stone-100 transition-colors cursor-pointer"
             >
               Open AI Resume Studio
-            </button>
-            <button
-              onClick={onOpenAudit}
-              className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-colors cursor-pointer"
-            >
-              Run Profile Audit
             </button>
             <button
               onClick={onOpenVIP}
