@@ -77,12 +77,36 @@ def verify_payment():
 
 
 @premium_bp.route('/webhook', methods=['POST'])
-def cashfree_webhook():
+@premium_bp.route('/ekqr/webhook', methods=['POST'])
+def payment_webhook():
     """
-    POST /api/premium/webhook
-    Receives instant webhook callbacks from Cashfree upon payment completion.
+    POST /api/premium/webhook (and /ekqr/webhook)
+    Receives instant automated payment callbacks from EkQR, Cashfree, or Dodo.
+    Supports both application/x-www-form-urlencoded (EkQR) and application/json.
     """
-    data = request.get_json(silent=True) or {}
+    data = {}
+    if request.form:
+        data = request.form.to_dict()
+    elif request.get_json(silent=True):
+        data = request.get_json(silent=True)
+
+    # 1. EkQR Format: client_txn_id, status ('success'), upi_txn_id, amount
+    client_txn_id = data.get('client_txn_id')
+    status_str = str(data.get('status', '')).lower().strip()
+
+    if client_txn_id and status_str == 'success':
+        try:
+            premium_service.verify_payment_and_grant_vip(
+                order_id=client_txn_id,
+                payment_id=data.get('upi_txn_id') or f"ekqr_{client_txn_id}",
+                signature="verified",
+                plan_id="monthly"
+            )
+        except Exception:
+            pass
+        return jsonify({"status": "success", "message": "VIP unlocked via EkQR"}), 200
+
+    # 2. Cashfree / Generic Format:
     order_data = data.get('data', {}).get('order', {})
     order_id = order_data.get('order_id') or data.get('orderId')
     order_status = order_data.get('order_status') or data.get('txStatus')

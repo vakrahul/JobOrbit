@@ -118,7 +118,13 @@ export default function VIPPage({ onBackToJobs }) {
         throw new Error(orderData.message || 'Failed to initialize payment gateway.');
       }
 
-      // If Cashfree session is available and SDK loaded
+      // 2. If EkQR payment URL is available (automated UPI QR & Intent buttons)
+      if (orderData.payment_url) {
+        window.location.href = orderData.payment_url;
+        return;
+      }
+
+      // 3. If Cashfree session is available and SDK loaded
       if (currency === 'INR' && orderData.payment_session_id && window.Cashfree) {
         try {
           const cashfree = window.Cashfree({

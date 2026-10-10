@@ -68,7 +68,8 @@ try:
         # ── Scheduler ─────────────────────────────────────────────────────────
         SYNC_INTERVAL_HOURS: int = 3
 
-        # ── Payments (Cashfree & Razorpay) ──────────────────────────────────
+        # ── Payments (EkQR UPI & Cashfree) ──────────────────────────────────
+        EKQR_API_KEY: Optional[str] = None
         CASHFREE_APP_ID: Optional[str] = None
         CASHFREE_SECRET_KEY: Optional[str] = None
         CASHFREE_ENV: str = "TEST"  # "TEST" (Sandbox) or "PROD" (Live)
@@ -160,6 +161,7 @@ except ImportError:
             "Mozilla/5.0 JobOrbitAggregator/2.0"
         )
         SYNC_INTERVAL_HOURS = int(os.getenv("SYNC_INTERVAL_HOURS", "3"))
+        EKQR_API_KEY = os.getenv("EKQR_API_KEY")
         CASHFREE_APP_ID = os.getenv("CASHFREE_APP_ID")
         CASHFREE_SECRET_KEY = os.getenv("CASHFREE_SECRET_KEY")
         CASHFREE_ENV = os.getenv("CASHFREE_ENV", "TEST")
