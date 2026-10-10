@@ -92,8 +92,47 @@ export default function App() {
   const handleSignOut = () => {
     localStorage.removeItem('joborbit_user_token');
     localStorage.removeItem('joborbit_user');
+    localStorage.removeItem('joborbit_is_vip');
     setCurrentUser(null);
   };
+
+  // Synchronize VIP status strictly with authenticated user's is_premium field
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.is_premium) {
+        localStorage.setItem('joborbit_is_vip', 'true');
+      } else {
+        localStorage.removeItem('joborbit_is_vip');
+      }
+    } else {
+      localStorage.removeItem('joborbit_is_vip');
+    }
+  }, [currentUser]);
+
+  // Refresh user profile from backend on mount if token exists
+  useEffect(() => {
+    const token = localStorage.getItem('joborbit_user_token');
+    if (token) {
+      fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success' && data.user) {
+          setCurrentUser(data.user);
+          localStorage.setItem('joborbit_user', JSON.stringify(data.user));
+          if (data.user.is_premium) {
+            localStorage.setItem('joborbit_is_vip', 'true');
+          } else {
+            localStorage.removeItem('joborbit_is_vip');
+          }
+        }
+      })
+      .catch(err => console.warn("Failed to refresh user profile:", err));
+    } else {
+      localStorage.removeItem('joborbit_is_vip');
+    }
+  }, []);
 
   // Sync hash and pathname with view state
   useEffect(() => {
@@ -271,7 +310,7 @@ export default function App() {
       <Navbar
         currentView={currentView}
         setCurrentView={handleSetView}
-        onOpenVIP={() => handleSetView('vip')}
+        onOpenVIP={() => setVipModalOpen(true)}
         onOpenLegal={handleOpenLegal}
         onOpenAuth={(mode) => handleOpenAuth(mode === 'signup' ? 'Sign up to access verified applications' : '')}
         onOpenProfile={() => setProfileModalOpen(true)}
@@ -317,7 +356,8 @@ export default function App() {
           />
         ) : currentView === 'hr' ? (
           <HRDirectory
-            onOpenVIP={() => handleSetView('vip')}
+            onOpenVIP={() => setVipModalOpen(true)}
+            currentUser={currentUser}
           />
         ) : currentView === 'match' ? (
           <ResumeMatcher
@@ -331,6 +371,8 @@ export default function App() {
         ) : currentView === 'vip' ? (
           <VIPPage
             onBackToJobs={() => handleSetView('public')}
+            currentUser={currentUser}
+            onOpenAuth={handleOpenAuth}
           />
         ) : currentView === 'admin' ? (
           !adminToken ? (
@@ -448,7 +490,19 @@ export default function App() {
       <VIPModal
         isOpen={vipModalOpen}
         onClose={() => setVipModalOpen(false)}
-        onActivateSuccess={() => {}}
+        currentUser={currentUser}
+        onOpenAuth={handleOpenAuth}
+        onActivateSuccess={(updatedUser, tier) => {
+          if (updatedUser) {
+            setCurrentUser(updatedUser);
+            localStorage.setItem('joborbit_user', JSON.stringify(updatedUser));
+          } else if (currentUser) {
+            const up = { ...currentUser, is_premium: true, premium_tier: tier || 'monthly' };
+            setCurrentUser(up);
+            localStorage.setItem('joborbit_user', JSON.stringify(up));
+          }
+          localStorage.setItem('joborbit_is_vip', 'true');
+        }}
       />
 
       {/* Global Terms, Career Policy & Security Shield Modal */}

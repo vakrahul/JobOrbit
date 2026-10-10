@@ -22,13 +22,13 @@ import {
   FileText
 } from 'lucide-react';
 
-export default function VIPPage({ onBackToJobs }) {
+export default function VIPPage({ onBackToJobs, currentUser, onOpenAuth }) {
   const [currency, setCurrency] = useState('INR'); // 'INR' or 'USD'
   const [selectedPlan, setSelectedPlan] = useState('monthly'); // 'monthly' | 'quarterly' | 'annual'
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState('');
   const [isActivated, setIsActivated] = useState(() => {
-    return localStorage.getItem('joborbit_is_vip') === 'true';
+    return Boolean(currentUser?.is_premium);
   });
   const [previewLocked, setPreviewLocked] = useState(true);
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -154,16 +154,10 @@ export default function VIPPage({ onBackToJobs }) {
         }
       }
 
-      // Complete verified activation
-      setTimeout(async () => {
-        await verifyPaymentOnBackend({
-          order_id: orderData.order_id,
-          payment_id: currency === 'INR' ? `cf_${Date.now()}` : `dodo_${Date.now()}`,
-          signature: 'verified',
-          plan_id: selectedPlan,
-          currency: currency
-        });
-      }, 900);
+      // If EkQR or payment URL was not returned, report error
+      if (!orderData.payment_url && !orderData.payment_session_id) {
+        throw new Error('Payment gateway could not generate transaction session. Please try again.');
+      }
     } catch (err) {
       console.error("Order creation failed:", err);
       setPaymentError(err.message || 'Payment initiation failed.');

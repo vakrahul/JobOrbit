@@ -52,6 +52,11 @@ export default function AuthModal({
       if (res.ok && data.status === 'success') {
         localStorage.setItem('joborbit_user_token', data.token);
         localStorage.setItem('joborbit_user', JSON.stringify(data.user));
+        if (data.user?.is_premium) {
+          localStorage.setItem('joborbit_is_vip', 'true');
+        } else {
+          localStorage.removeItem('joborbit_is_vip');
+        }
         setSuccessMsg(tab === 'signup' ? 'Account created successfully!' : 'Signed in successfully!');
         setTimeout(() => {
           if (onSuccess) onSuccess(data.user, data.token);
@@ -101,6 +106,11 @@ export default function AuthModal({
                   if (res.ok && data.status === 'success') {
                     localStorage.setItem('joborbit_user_token', data.token);
                     localStorage.setItem('joborbit_user', JSON.stringify(data.user));
+                    if (data.user?.is_premium) {
+                      localStorage.setItem('joborbit_is_vip', 'true');
+                    } else {
+                      localStorage.removeItem('joborbit_is_vip');
+                    }
                     setSuccessMsg(`Signed in with Google as ${userInfo.email}!`);
                     setTimeout(() => {
                       if (onSuccess) onSuccess(data.user, data.token);

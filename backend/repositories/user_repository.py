@@ -4,6 +4,7 @@ repositories/user_repository.py
 OOP Data access layer for User and SavedJob (Application Pipeline Tracker).
 """
 from typing import Optional, List
+from datetime import datetime, timezone
 from models.user import User, SavedJob
 from models.job import Job
 from core.extensions import db
@@ -83,6 +84,7 @@ class UserRepository:
         if user:
             user.is_premium = True
             user.premium_tier = tier
+            user.premium_since = datetime.now(timezone.utc)
             db.session.commit()
         return user
 

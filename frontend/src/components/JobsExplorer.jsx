@@ -95,11 +95,10 @@ export default function JobsExplorer({ currentUser, onOpenAuth, onOpenVIP }) {
       return false;
     }
 
-    const isVip = typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true';
+    const isVip = Boolean(activeUser?.is_premium);
     if (job?.is_vip_exclusive && !isVip) {
       e.preventDefault();
       e.stopPropagation();
-      alert("VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
       if (onOpenVIP) onOpenVIP();
       else window.location.hash = 'vip';
       return false;
@@ -411,7 +410,7 @@ export default function JobsExplorer({ currentUser, onOpenAuth, onOpenVIP }) {
                   className="mt-4 pt-3 border-t border-[#EFE9DF] flex items-center justify-between gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {job.is_vip_exclusive && !(typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true') ? (
+                  {job.is_vip_exclusive && !Boolean(activeUser?.is_premium) ? (
                     <button
                       onClick={(e) => handleApplyClick(e, job)}
                       className="flex-1 py-2 px-3 text-xs font-bold rounded-xl bg-[#1C1917] hover:bg-[#292524] text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"

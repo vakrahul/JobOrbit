@@ -76,6 +76,26 @@ def verify_payment():
         return jsonify(e.to_dict()), e.status_code
 
 
+@premium_bp.route('/check-status', methods=['GET', 'POST'])
+@limiter.limit("60 per minute")
+def check_status():
+    """
+    GET/POST /api/premium/check-status
+    Query/Body: { order_id, user_id? }
+    Checks if order payment has settled and upgrades user.
+    """
+    order_id = request.args.get('order_id')
+    user_id = request.args.get('user_id', type=int)
+
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        order_id = data.get('order_id') or order_id
+        user_id = data.get('user_id') or user_id
+
+    result = premium_service.check_payment_status(order_id=order_id or '', user_id=user_id)
+    return jsonify(result)
+
+
 @premium_bp.route('/webhook', methods=['POST'])
 @premium_bp.route('/ekqr/webhook', methods=['POST'])
 def payment_webhook():
@@ -96,11 +116,12 @@ def payment_webhook():
 
     if client_txn_id and status_str == 'success':
         try:
+            plan_id = data.get('udf2') or 'monthly'
             premium_service.verify_payment_and_grant_vip(
                 order_id=client_txn_id,
                 payment_id=data.get('upi_txn_id') or f"ekqr_{client_txn_id}",
                 signature="verified",
-                plan_id="monthly"
+                plan_id=plan_id
             )
         except Exception:
             pass

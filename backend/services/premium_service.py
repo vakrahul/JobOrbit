@@ -232,13 +232,19 @@ class PremiumService:
             upi_intent = None
         else:
             amount = plan.get('price_inr', 75)
-            order_id = f"joborbit_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+            # Encode user_id directly into order_id for bulletproof webhook & status tracking
+            order_id = f"joborbit_{user_id or 0}_{int(time.time())}_{uuid.uuid4().hex[:4]}"
             gateway = 'ekqr' if settings.EKQR_API_KEY else 'cashfree'
             gateway_label = 'EkQR Instant UPI (GPay, PhonePe, Paytm, QR)' if settings.EKQR_API_KEY else 'Cashfree Payments (India UPI/Cards)'
             payment_url = None
             payment_session_id = None
             cashfree_mode = 'sandbox' if settings.CASHFREE_ENV == 'TEST' else 'production'
             upi_intent = None
+
+            # Look up user details if user_id is provided
+            candidate_user = user_repo.get_by_id(user_id) if user_id else None
+            cust_name = candidate_user.name if candidate_user and candidate_user.name else "JobOrbit Candidate"
+            cust_email = candidate_user.email if candidate_user and candidate_user.email else "candidate@joborbit.live"
 
             # 1. EkQR Instant Automated UPI
             if settings.EKQR_API_KEY:
@@ -249,11 +255,12 @@ class PremiumService:
                         "client_txn_id": order_id,
                         "amount": str(int(amount)),
                         "p_info": f"JobOrbit VIP Pass ({plan.get('name', 'VIP')})",
-                        "customer_name": "JobOrbit Candidate",
-                        "customer_email": "candidate@joborbit.live",
+                        "customer_name": cust_name,
+                        "customer_email": cust_email,
                         "customer_mobile": "9999999999",
-                        "redirect_url": f"https://joborbit.live/vip?order_id={order_id}&status=success",
-                        "udf1": "joborbit_vip"
+                        "redirect_url": f"https://joborbit.live/#vip?order_id={order_id}&status=success",
+                        "udf1": f"user_{user_id or 0}",
+                        "udf2": plan_id
                     }
                     req = urllib.request.Request(
                         ek_url,
@@ -322,12 +329,127 @@ class PremiumService:
             'plan': plan
         }
 
+    def check_payment_status(self, order_id: str, user_id: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Polls payment status from EkQR / Cashfree / DB.
+        If payment succeeded, automatically upgrades the user.
+        """
+        import urllib.request
+        import json
+        from datetime import datetime, timezone
+        import logging
+        logger = logging.getLogger("payment_status_check")
+
+        # Resolve user
+        resolved_user_id = user_id
+        if not resolved_user_id and order_id and order_id.startswith('joborbit_'):
+            try:
+                parts = order_id.split('_')
+                if len(parts) >= 2 and parts[1].isdigit():
+                    uid = int(parts[1])
+                    if uid > 0:
+                        resolved_user_id = uid
+            except Exception:
+                pass
+
+        user = user_repo.get_by_id(resolved_user_id) if resolved_user_id else None
+
+        # 1. If user is already premium in DB
+        if user and user.is_premium:
+            return {
+                'status': 'success',
+                'is_paid': True,
+                'is_premium': True,
+                'tier': user.premium_tier,
+                'user': user.to_dict(),
+                'message': 'VIP membership is active!'
+            }
+
+        # 2. Check EkQR status if configured
+        if settings.EKQR_API_KEY and order_id:
+            try:
+                today_str = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+                ek_url = "https://api.ekqr.in/api/check_order_status"
+                ek_payload = {
+                    "key": settings.EKQR_API_KEY,
+                    "client_txn_id": order_id,
+                    "txn_date": today_str
+                }
+                req = urllib.request.Request(
+                    ek_url,
+                    data=json.dumps(ek_payload).encode('utf-8'),
+                    headers={"Content-Type": "application/json", "Accept": "application/json"},
+                    method="POST"
+                )
+                with urllib.request.urlopen(req, timeout=8) as resp:
+                    resp_data = json.loads(resp.read().decode('utf-8'))
+                    if resp_data.get('status'):
+                        data_obj = resp_data.get('data', {})
+                        ek_status = str(data_obj.get('status', '')).lower().strip()
+                        if ek_status == 'success':
+                            plan_id = data_obj.get('udf2') or 'monthly'
+                            if user:
+                                user_repo.set_premium(user.id, tier=plan_id)
+                                return {
+                                    'status': 'success',
+                                    'is_paid': True,
+                                    'is_premium': True,
+                                    'tier': plan_id,
+                                    'upi_txn_id': data_obj.get('upi_txn_id'),
+                                    'user': user.to_dict(),
+                                    'message': 'UPI Payment successfully verified!'
+                                }
+                            return {
+                                'status': 'success',
+                                'is_paid': True,
+                                'is_premium': True,
+                                'tier': plan_id,
+                                'upi_txn_id': data_obj.get('upi_txn_id'),
+                                'message': 'Payment confirmed!'
+                            }
+            except Exception as e:
+                logger.warning(f"[EKQR] Status check error: {e}")
+
+        # 3. Check Cashfree if configured
+        if settings.CASHFREE_APP_ID and settings.CASHFREE_SECRET_KEY and order_id:
+            try:
+                cf_url = f"https://sandbox.cashfree.com/pg/orders/{order_id}" if settings.CASHFREE_ENV == "TEST" else f"https://api.cashfree.com/pg/orders/{order_id}"
+                cf_headers = {
+                    "x-client-id": settings.CASHFREE_APP_ID,
+                    "x-client-secret": settings.CASHFREE_SECRET_KEY,
+                    "x-api-version": settings.CASHFREE_API_VERSION,
+                    "Accept": "application/json"
+                }
+                req = urllib.request.Request(cf_url, headers=cf_headers)
+                with urllib.request.urlopen(req, timeout=6) as resp:
+                    cf_order = json.loads(resp.read().decode('utf-8'))
+                    if cf_order.get('order_status') in ['PAID', 'SUCCESS']:
+                        if user:
+                            user_repo.set_premium(user.id, tier='monthly')
+                            return {
+                                'status': 'success',
+                                'is_paid': True,
+                                'is_premium': True,
+                                'tier': user.premium_tier,
+                                'user': user.to_dict(),
+                                'message': 'Cashfree payment verified!'
+                            }
+            except Exception as e:
+                logger.warning(f"[CASHFREE] Status check error: {e}")
+
+        return {
+            'status': 'pending',
+            'is_paid': False,
+            'is_premium': user.is_premium if user else False,
+            'message': 'Waiting for payment confirmation...'
+        }
+
     def verify_payment_and_grant_vip(
         self,
         order_id: str,
         payment_id: str,
         signature: str,
-        plan_id: str = 'lifetime',
+        plan_id: str = 'monthly',
         user_id: Optional[int] = None
     ) -> Dict[str, Any]:
         if not order_id:
@@ -335,10 +457,51 @@ class PremiumService:
 
         import urllib.request
         import json
+        from datetime import datetime, timezone
         import logging
-        logger = logging.getLogger("cashfree_service")
+        logger = logging.getLogger("payment_verification")
 
-        # 1. Direct status check with Cashfree if it's a Cashfree order
+        # Resolve user_id from order_id if not explicitly provided
+        resolved_user_id = user_id
+        if not resolved_user_id and order_id and order_id.startswith('joborbit_'):
+            try:
+                parts = order_id.split('_')
+                if len(parts) >= 2 and parts[1].isdigit():
+                    uid = int(parts[1])
+                    if uid > 0:
+                        resolved_user_id = uid
+            except Exception:
+                pass
+
+        user = user_repo.get_by_id(resolved_user_id) if resolved_user_id else None
+
+        # 1. Direct status check with EkQR API
+        is_paid_on_ekqr = False
+        if settings.EKQR_API_KEY and order_id:
+            try:
+                today_str = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+                ek_url = "https://api.ekqr.in/api/check_order_status"
+                ek_payload = {
+                    "key": settings.EKQR_API_KEY,
+                    "client_txn_id": order_id,
+                    "txn_date": today_str
+                }
+                req = urllib.request.Request(
+                    ek_url,
+                    data=json.dumps(ek_payload).encode('utf-8'),
+                    headers={"Content-Type": "application/json", "Accept": "application/json"},
+                    method="POST"
+                )
+                with urllib.request.urlopen(req, timeout=8) as resp:
+                    resp_data = json.loads(resp.read().decode('utf-8'))
+                    if resp_data.get('status'):
+                        data_obj = resp_data.get('data', {})
+                        if str(data_obj.get('status', '')).lower().strip() == 'success':
+                            is_paid_on_ekqr = True
+            except Exception as e:
+                logger.warning(f"[EKQR] Verification query error: {e}")
+
+        # 2. Direct status check with Cashfree if it's a Cashfree order
         is_paid_on_cashfree = False
         if settings.CASHFREE_APP_ID and settings.CASHFREE_SECRET_KEY and order_id:
             try:
@@ -357,7 +520,7 @@ class PremiumService:
             except Exception as e:
                 logger.warning(f"[CASHFREE] Verification query error: {e}")
 
-        # 2. Cryptographic HMAC or test verification
+        # 3. Cryptographic HMAC or test verification
         secret = settings.RAZORPAY_KEY_SECRET or 'mock_secret_key_99rs'
         generated_sig = hmac.new(
             secret.encode('utf-8'),
@@ -366,18 +529,16 @@ class PremiumService:
         ).hexdigest()
 
         is_valid = (
-            is_paid_on_cashfree
+            is_paid_on_ekqr
+            or is_paid_on_cashfree
             or signature == generated_sig
             or (payment_id and payment_id.startswith('mock_'))
             or signature in ('mock_verified', 'verified')
-            or settings.CASHFREE_ENV == 'TEST'
-            or settings.FLASK_ENV == 'development'
         )
 
         if not is_valid:
-            raise AuthError("Payment verification could not be validated.")
+            raise AuthError("Payment verification could not be validated. Transaction is still pending.")
 
-        user = user_repo.get_by_id(user_id) if user_id else user_repo.get_default_or_create()
         if user:
             user_repo.set_premium(user.id, tier=plan_id)
 
@@ -387,6 +548,7 @@ class PremiumService:
             'payment_id': payment_id,
             'order_id': order_id,
             'tier': plan_id,
+            'user': user.to_dict() if user else None,
             'unlocked_features': [
                 'Instant Zero-Minute Early Access Drops',
                 'Revealed Verified HR Manager Direct Emails',

@@ -40,9 +40,9 @@ export default function UserProfileModal({
     const count = parseInt(localStorage.getItem('joborbit_applied_count') || '0', 10);
     setAppliedCount(count);
 
-    // 2. Read VIP status
-    const vipStatus = localStorage.getItem('joborbit_is_vip') === 'true' || currentUser?.is_vip;
-    setIsVip(!!vipStatus);
+    // 2. Read VIP status strictly from authenticated user object
+    const vipStatus = Boolean(currentUser?.is_premium);
+    setIsVip(vipStatus);
 
     // 3. Load user reviews from localStorage
     try {
@@ -132,11 +132,11 @@ export default function UserProfileModal({
             {/* Card 1: Account Status */}
             <div className="p-4 rounded-xl bg-[#FAF9F5] border border-[#EBE6DD]">
               <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider block mb-1">
-                Account Status
+                Account Membership
               </span>
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-bold ${isVip ? 'text-amber-800' : 'text-stone-800'}`}>
-                  {isVip ? 'VIP Member' : 'Free Trial'}
+                  {isVip ? `VIP Active (${currentUser?.premium_tier || 'Pass'})` : 'Free Plan'}
                 </span>
                 {isVip ? (
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
@@ -145,7 +145,7 @@ export default function UserProfileModal({
                 ) : (
                   <button 
                     onClick={() => { onClose(); onOpenVIP?.(); }}
-                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 underline cursor-pointer"
+                    className="text-[11px] font-bold text-amber-600 hover:text-amber-800 underline cursor-pointer"
                   >
                     Upgrade (₹75)
                   </button>

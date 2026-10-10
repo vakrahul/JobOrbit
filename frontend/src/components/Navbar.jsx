@@ -4,7 +4,9 @@ import {
   User, 
   LogOut,
   Bookmark,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -25,7 +27,9 @@ export default function Navbar({
     setAppliedCount(count);
   }, [currentUser]);
 
-  // Clean, minimal primary links only (Hidden: AI Audit Agent, Research, AI Matcher)
+  const isPremium = Boolean(currentUser?.is_premium);
+
+  // Clean, minimal primary links only
   const navLinks = [
     { id: 'public', label: 'Find Jobs' },
     { id: 'hr', label: 'Companies & HR' },
@@ -86,7 +90,37 @@ export default function Navbar({
           <div className="flex items-center gap-3 shrink-0">
             
             {currentUser ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
+                
+                {/* Clear Membership Label: VIP vs Free */}
+                {isPremium ? (
+                  <button
+                    onClick={onOpenVIP}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-300 text-amber-900 text-xs font-bold shadow-2xs hover:bg-amber-100 transition-colors cursor-pointer"
+                    title="VIP Membership Active - Early Drops & Recruiter Contacts Unlocked"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
+                    <span>VIP Member</span>
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span 
+                      className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-stone-100 border border-stone-200 text-stone-600 text-[11px] font-semibold"
+                      title="Free Candidate Plan"
+                    >
+                      Free Plan
+                    </span>
+                    <button
+                      onClick={onOpenVIP}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                      title="Unlock Early Drops & Direct Recruiter Emails for ₹75/mo"
+                    >
+                      <Sparkles className="w-3 h-3 fill-white" />
+                      <span>Upgrade VIP</span>
+                    </button>
+                  </div>
+                )}
+
                 {/* Tracker Link */}
                 <button
                   onClick={() => setCurrentView('tracker')}
@@ -106,13 +140,17 @@ export default function Navbar({
                   className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF9F5] text-stone-800 text-xs font-bold border border-[#EBE6DD] hover:border-[#D6CEBF] transition-all cursor-pointer"
                   title="Open Candidate Profile"
                 >
-                  <span className="w-5 h-5 rounded-full bg-[#4640DE] text-white flex items-center justify-center text-[10px] shrink-0 font-black">
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 font-black ${
+                    isPremium ? 'bg-amber-500 text-white' : 'bg-[#4640DE] text-white'
+                  }`}>
                     {(currentUser.name || currentUser.email || 'U')[0].toUpperCase()}
                   </span>
                   <span className="hidden sm:inline max-w-[100px] truncate text-stone-900 font-semibold">
                     {currentUser.name || currentUser.email?.split('@')[0]}
                   </span>
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-[#EAE4D5] text-stone-700">
+                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-semibold ${
+                    isPremium ? 'bg-amber-100 text-amber-800' : 'bg-[#EAE4D5] text-stone-700'
+                  }`}>
                     {appliedCount} applied
                   </span>
                 </button>
@@ -128,6 +166,13 @@ export default function Navbar({
               </div>
             ) : (
               <div className="flex items-center gap-2">
+                <button
+                  onClick={onOpenVIP}
+                  className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200/80 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-600" />
+                  <span>VIP Access</span>
+                </button>
                 <button
                   onClick={() => onOpenAuth?.("login")}
                   className="px-3.5 py-1.5 text-xs sm:text-sm font-bold text-stone-700 hover:text-stone-900 transition-colors cursor-pointer"

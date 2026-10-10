@@ -16,12 +16,12 @@ import {
   Unlock
 } from 'lucide-react';
 
-export default function HRDirectory({ onOpenVIP }) {
+export default function HRDirectory({ onOpenVIP, currentUser }) {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [copiedId, setCopiedId] = useState(null);
-  const isVIP = localStorage.getItem('joborbit_is_vip') === 'true';
+  const isVIP = Boolean(currentUser?.is_premium);
   
   // AI Outreach Drafter Modal
   const [activeModalContact, setActiveModalContact] = useState(null);

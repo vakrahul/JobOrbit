@@ -144,10 +144,9 @@ export default function JobDetailPage({ jobId, onBack, currentUser, onOpenAuth, 
       return false;
     }
 
-    const isVip = typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true';
+    const isVip = Boolean(activeUser?.is_premium);
     if (job?.is_vip_exclusive && !isVip) {
       if (e) { e.preventDefault(); e.stopPropagation(); }
-      alert("VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
       if (onOpenVIP) onOpenVIP();
       else window.location.hash = 'vip';
       return false;
@@ -398,10 +397,10 @@ export default function JobDetailPage({ jobId, onBack, currentUser, onOpenAuth, 
               <span>{copiedLink ? 'Link Copied!' : 'Share'}</span>
             </button>
 
-            {job.is_vip_exclusive && !(typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true') ? (
+            {job.is_vip_exclusive && !Boolean(currentUser?.is_premium) ? (
               <button
                 onClick={(e) => handleApplyClick(e)}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
                 <span>Unlock VIP Drop with VIP Pass (₹75)</span>
               </button>
@@ -620,14 +619,14 @@ export default function JobDetailPage({ jobId, onBack, currentUser, onOpenAuth, 
               Apply to {job.company}
             </h3>
 
-            {job.is_vip_exclusive && !(typeof window !== 'undefined' && localStorage.getItem('joborbit_is_vip') === 'true') ? (
+            {job.is_vip_exclusive && !Boolean(currentUser?.is_premium) ? (
               <div className="space-y-3">
                 <p className="text-xs text-slate-600 leading-relaxed">
                   <strong>VIP Exclusive Drop:</strong> This high-demand role requires JobOrbit VIP Access (₹75/mo) to unlock direct ATS application links and recruiter contacts.
                 </p>
                 <button
                   onClick={(e) => handleApplyClick(e)}
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer text-center"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer text-center"
                 >
                   <span>Unlock VIP Drop (₹75)</span>
                 </button>
