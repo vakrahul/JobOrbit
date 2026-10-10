@@ -55,7 +55,7 @@ export default function VIPPage({ onBackToJobs }) {
     localStorage.setItem('joborbit_notif_email', notifEmail);
     localStorage.setItem('joborbit_notif_freq', notifFrequency);
     localStorage.setItem('joborbit_notif_categories', JSON.stringify(selectedCategories));
-    setNotifSavedMsg('✅ Notification preferences saved! Fresh drops will dispatch within 5 hours of posting.');
+    setNotifSavedMsg('Notification preferences saved! Fresh drops will dispatch within 5 hours of posting.');
     setTimeout(() => setNotifSavedMsg(''), 4000);
   };
 
@@ -63,18 +63,18 @@ export default function VIPPage({ onBackToJobs }) {
     setTestDispatched(true);
     setTimeout(() => {
       setTestDispatched(false);
-      alert(`📬 Real-Time VIP Job Drop Dispatched to ${notifEmail}!\n\nDelivery SLA: Within 5 hours of company posting\nFrequency: ${notifFrequency} drops/day\n\nIncluded Curated Positions:\n1. xstratum.ai — Agentic AI Intern (SF / Remote, $40/hr)\n2. Aden (YC) — Core Product Engineer (SF / Remote, $120k)\n3. Zepto — Backend SDE Intern (Bengaluru, ₹60k/mo)\n4. Swiggy — AI Platform Engineer (₹18L - ₹24L)\n5. Google — Software Engineering Intern (Summer 2026)`);
+      alert(`Real-Time VIP Job Drop Dispatched to ${notifEmail}!\n\nDelivery SLA: Within 5 hours of company posting\nFrequency: ${notifFrequency} drops/day\n\nIncluded Curated Positions:\n1. xstratum.ai — Agentic AI Intern (SF / Remote, $40/hr)\n2. Aden (YC) — Core Product Engineer (SF / Remote, $120k)\n3. Zepto — Backend SDE Intern (Bengaluru, ₹60k/mo)\n4. Swiggy — AI Platform Engineer (₹18L - ₹24L)\n5. Google — Software Engineering Intern (Summer 2026)`);
     }, 600);
   };
 
   const plansData = currency === 'INR' ? {
     monthly: { id: 'monthly', name: '1-Month Pass', price: '₹75', period: '/ month', note: 'Billed monthly · Cancel anytime', savings: null, badge: null },
-    quarterly: { id: 'quarterly', name: '3-Month Quarterly Pass', price: '₹215', period: 'for 3 months', note: '₹71.6/mo · Save ₹10', savings: 'Save ₹10', badge: '★ MOST POPULAR' },
-    annual: { id: 'annual', name: '1-Year Annual Pass', price: '₹699', period: 'for 12 months', note: '₹58/mo · Best Value', savings: 'Save 22%', badge: '★ BEST VALUE' }
+    quarterly: { id: 'quarterly', name: '3-Month Quarterly Pass', price: '₹215', period: 'for 3 months', note: '₹71.6/mo · Save ₹10', savings: 'Save ₹10', badge: 'MOST POPULAR' },
+    annual: { id: 'annual', name: '1-Year Annual Pass', price: '₹699', period: 'for 12 months', note: '₹58/mo · Best Value', savings: 'Save 22%', badge: 'BEST VALUE' }
   } : {
     monthly: { id: 'monthly', name: '1-Month Pass', price: '$9.99', period: '/ month', note: 'Billed monthly · Cancel anytime', savings: null, badge: null },
-    quarterly: { id: 'quarterly', name: '3-Month Quarterly Pass', price: '$24.99', period: 'for 3 months', note: '$8.33/mo · Save 16%', savings: 'Save 16%', badge: '★ MOST POPULAR' },
-    annual: { id: 'annual', name: '1-Year Annual Pass', price: '$79.99', period: 'for 12 months', note: '$6.66/mo · Best Value', savings: 'Save 33%', badge: '★ BEST VALUE' }
+    quarterly: { id: 'quarterly', name: '3-Month Quarterly Pass', price: '$24.99', period: 'for 3 months', note: '$8.33/mo · Save 16%', savings: 'Save 16%', badge: 'MOST POPULAR' },
+    annual: { id: 'annual', name: '1-Year Annual Pass', price: '$79.99', period: 'for 12 months', note: '$6.66/mo · Best Value', savings: 'Save 33%', badge: 'BEST VALUE' }
   };
 
   const activePlan = plansData[selectedPlan] || plansData['quarterly'];
@@ -453,12 +453,12 @@ export default function VIPPage({ onBackToJobs }) {
               <tr className="bg-amber-50/40">
                 <td className="py-3.5 px-4 font-semibold text-slate-900">New Role Drop Timing</td>
                 <td className="py-3.5 px-4 text-slate-500">Standard Delay (6–8h after scrape)</td>
-                <td className="py-3.5 px-4 font-bold text-amber-900">⚡ Instant 0-Hour Early Access</td>
+                <td className="py-3.5 px-4 font-bold text-amber-900">Instant 0-Hour Early Access</td>
               </tr>
               <tr className="bg-blue-50/40">
                 <td className="py-3.5 px-4 font-semibold text-slate-900">Recruiter Corporate Emails</td>
                 <td className="py-3.5 px-4 text-slate-500">Obfuscated (e.g. pr***@google.com)</td>
-                <td className="py-3.5 px-4 font-bold text-blue-900">🔓 100% Unlocked Direct Emails</td>
+                <td className="py-3.5 px-4 font-bold text-blue-900">100% Unlocked Direct Emails</td>
               </tr>
               <tr>
                 <td className="py-3.5 px-4 font-semibold text-slate-900">IIT / IISc Research Labs</td>
@@ -503,7 +503,7 @@ export default function VIPPage({ onBackToJobs }) {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-black text-slate-900">👑 VIP PASS MEMBER ACTIVATED</span>
+                    <span className="text-sm font-black text-slate-900">VIP PASS MEMBER ACTIVATED</span>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-600 text-white">
                       Verified
                     </span>
@@ -569,7 +569,7 @@ export default function VIPPage({ onBackToJobs }) {
               <div className="p-3.5 rounded-xl bg-amber-100/70 border border-amber-300/80 flex items-center gap-2.5 text-xs text-amber-900">
                 <Clock className="w-4 h-4 text-amber-700 shrink-0" />
                 <span>
-                  <strong>⚡ Verified 5-Hour Freshness SLA:</strong> All matching roles are dispatched to your inbox within <strong>5 hours</strong> of company posting — never stale 6-month-old listings.
+                  <strong>Verified 5-Hour Freshness SLA:</strong> All matching roles are dispatched to your inbox within <strong>5 hours</strong> of company posting — never stale 6-month-old listings.
                 </span>
               </div>
 
@@ -592,7 +592,7 @@ export default function VIPPage({ onBackToJobs }) {
                     disabled={testDispatched || !emailNotifEnabled}
                     className="px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0"
                   >
-                    {testDispatched ? 'Dispatching...' : '⚡ Test Drop Now'}
+                    {testDispatched ? 'Dispatching...' : 'Test Drop Now'}
                   </button>
                 </div>
               </div>
@@ -794,7 +794,7 @@ export default function VIPPage({ onBackToJobs }) {
                     currency === 'INR' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span>🇮🇳 India (INR) &bull; Cashfree UPI/Cards</span>
+                  <span>India (INR) &bull; Cashfree UPI/Cards</span>
                 </button>
                 <button
                   type="button"
@@ -803,7 +803,7 @@ export default function VIPPage({ onBackToJobs }) {
                     currency === 'USD' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span>🌐 US &amp; Global (USD) &bull; Dodo Payments</span>
+                  <span>US &amp; Global (USD) &bull; Dodo Payments</span>
                 </button>
               </div>
             </div>

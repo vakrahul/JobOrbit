@@ -166,7 +166,7 @@ export default function LinkedInScraperRunner({ adminToken, onRefreshStats }) {
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span>🔵 LinkedIn Bot</span>
+              <span>LinkedIn Bot</span>
             </button>
             <button
               onClick={() => { setPlatform('internshala'); setScrapedJobs([]); }}
@@ -176,7 +176,7 @@ export default function LinkedInScraperRunner({ adminToken, onRefreshStats }) {
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span>🌐 Internshala Bot</span>
+              <span>Internshala Bot</span>
             </button>
           </div>
         </div>

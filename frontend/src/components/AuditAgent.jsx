@@ -139,7 +139,7 @@ ${auditData.audit?.bullet_audits?.map((b, i) => `${i + 1}. [BEFORE] ${b.original
             </div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>⚡ Autonomous Audit Engine Active</span>
+              <span>Autonomous Audit Engine Active</span>
             </div>
           </div>
 
@@ -348,12 +348,12 @@ ${auditData.audit?.bullet_audits?.map((b, i) => `${i + 1}. [BEFORE] ${b.original
                 <div className="space-y-3">
                   <div>
                     <span className="text-[11px] font-bold text-emerald-700 block mb-1.5">
-                      ✓ Verified Technical Competencies ({auditData.detected_skills?.length || 0}):
+                      Verified Technical Competencies ({auditData.detected_skills?.length || 0}):
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {auditData.detected_skills?.map((sk, sIdx) => (
                         <span key={sIdx} className="text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-lg">
-                          ✓ {sk}
+                          {sk}
                         </span>
                       ))}
                     </div>
@@ -362,7 +362,7 @@ ${auditData.audit?.bullet_audits?.map((b, i) => `${i + 1}. [BEFORE] ${b.original
                   {auditData.audit?.missing_critical_skills?.length > 0 && (
                     <div className="border-t border-slate-100 pt-3">
                       <span className="text-[11px] font-bold text-amber-700 block mb-1.5">
-                        ⚠ Missing High-Yield Keywords ({auditData.audit.missing_critical_skills.length}):
+                        Missing High-Yield Keywords ({auditData.audit.missing_critical_skills.length}):
                       </span>
                       <div className="flex flex-wrap gap-1.5">
                         {auditData.audit.missing_critical_skills.map((sk, sIdx) => (
@@ -392,7 +392,7 @@ ${auditData.audit?.bullet_audits?.map((b, i) => `${i + 1}. [BEFORE] ${b.original
                       </div>
 
                       <div className="text-xs text-slate-900 font-medium bg-emerald-50/80 border border-emerald-200/80 p-2.5 rounded-lg">
-                        <span className="font-bold text-emerald-800 mr-1.5">★ [STAR Optimized]:</span>
+                        <span className="font-bold text-emerald-800 mr-1.5">[STAR Optimized]:</span>
                         {item.improved_star}
                       </div>
 

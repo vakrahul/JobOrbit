@@ -162,7 +162,7 @@ export default function PipelineConsole({
                 ? 'bg-blue-100 text-blue-800 border border-blue-200' 
                 : 'bg-slate-900 text-white'
             }`}>
-              {syncMode === 'incremental' ? '⚡ Incremental Delta Sync (Fastest)' : '🔄 Full Archive Backfill'}
+              {syncMode === 'incremental' ? 'Incremental Delta Sync (Fastest)' : 'Full Archive Backfill'}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
@@ -182,7 +182,7 @@ export default function PipelineConsole({
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            ⚡ New Today (Delta)
+            New Today (Delta)
           </button>
           <button
             onClick={() => setSyncMode('full')}
@@ -192,7 +192,7 @@ export default function PipelineConsole({
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🔄 Full Archive
+            Full Archive
           </button>
         </div>
       </div>

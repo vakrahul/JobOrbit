@@ -239,7 +239,7 @@ export default function HRDirectory({ onOpenVIP }) {
                   )}
                   {contact.location && (
                     <p className="text-[11px] text-slate-400">
-                      📍 {contact.location}
+                      {contact.location}
                     </p>
                   )}
                 </div>

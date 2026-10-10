@@ -64,7 +64,7 @@ export default function PublicHero({
           </div>
 
           <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200">
-            <p className="text-xs text-amber-700 font-medium">⚡ Added Today</p>
+            <p className="text-xs text-amber-700 font-medium">Added Today</p>
             <p className="text-2xl font-bold text-amber-800 mt-0.5">
               +{newToday.toLocaleString()}
             </p>

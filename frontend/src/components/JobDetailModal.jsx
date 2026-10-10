@@ -126,7 +126,7 @@ export default function JobDetailModal({ job, onClose, currentUser, onOpenAuth, 
     if (job?.is_vip_exclusive && !isVip) {
       if (e) { e.preventDefault(); e.stopPropagation(); }
       onClose?.();
-      alert("👑 VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
+      alert("VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
       if (onOpenVIP) onOpenVIP();
       else window.location.hash = 'vip';
       return false;
@@ -137,7 +137,7 @@ export default function JobDetailModal({ job, onClose, currentUser, onOpenAuth, 
       if (count >= 5) {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         onClose?.();
-        alert("⚠️ Free Trial Limit Reached (5/5 Applications Used)!\n\nDuring your free trial, accounts are limited to 5 applications.\n\nUpgrade to VIP Pass (₹75 / $9.99) for unlimited direct applications and real-time drops!");
+        alert("Free Trial Limit Reached (5/5 Applications Used)!\n\nDuring your free trial, accounts are limited to 5 applications.\n\nUpgrade to VIP Pass (₹75 / $9.99) for unlimited direct applications and real-time drops!");
         if (onOpenVIP) onOpenVIP();
         else window.location.hash = 'vip';
         return false;
@@ -163,7 +163,7 @@ export default function JobDetailModal({ job, onClose, currentUser, onOpenAuth, 
               {/* VIP Badge */}
               {job.is_vip_exclusive && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-black rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-2xs">
-                  <span>👑 VIP Exclusive Drop</span>
+                  <span>VIP Exclusive Drop</span>
                 </span>
               )}
 
@@ -178,7 +178,7 @@ export default function JobDetailModal({ job, onClose, currentUser, onOpenAuth, 
                     ? 'bg-purple-100 text-purple-800 border border-purple-300'
                     : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                 }`}>
-                  {job.source_platform.id === 'linkedin' ? '🔵 ' : job.source_platform.id === 'internshala' ? '🌐 ' : job.source_platform.id === 'wellfound' ? '🟣 ' : '🟢 '}
+                  
                   {job.source_platform.badge_label || job.source}
                 </span>
               ) : null}
@@ -195,7 +195,7 @@ export default function JobDetailModal({ job, onClose, currentUser, onOpenAuth, 
               )}
               {job.is_remote && (
                 <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-200">
-                  🏠 Remote
+                  Remote
                 </span>
               )}
               <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-700">
@@ -482,7 +482,7 @@ export default function JobDetailModal({ job, onClose, currentUser, onOpenAuth, 
                       onClick={(e) => handleApplyClick(e)}
                       className="w-full py-3 px-4 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <span>👑 Unlock VIP Drop with VIP Pass (₹75)</span>
+                      <span>Unlock VIP Drop with VIP Pass (₹75)</span>
                     </button>
                   ) : applyUrl ? (
                     <a

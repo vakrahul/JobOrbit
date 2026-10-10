@@ -154,7 +154,7 @@ export default function VIPModal({ isOpen, onClose, onActivateSuccess }) {
                   currency === 'INR' ? 'bg-white text-blue-900 shadow-xs' : 'text-white/80 hover:text-white'
                 }`}
               >
-                🇮🇳 INR
+                INR
               </button>
               <button
                 type="button"
@@ -163,7 +163,7 @@ export default function VIPModal({ isOpen, onClose, onActivateSuccess }) {
                   currency === 'USD' ? 'bg-white text-blue-900 shadow-xs' : 'text-white/80 hover:text-white'
                 }`}
               >
-                🌐 USD
+                USD
               </button>
             </div>
           </div>
@@ -247,11 +247,11 @@ export default function VIPModal({ isOpen, onClose, onActivateSuccess }) {
               {/* Perks List */}
               <div className="space-y-2 pt-1 text-xs text-slate-700">
                 {[
-                  '⚡ 6–8 Hours Early Access window on new tech drops',
-                  '🔓 100% Unlocked recruiter & professor emails',
-                  '🤖 Unlimited Autonomous AI Resume Tailoring',
-                  '✉️ 1-Click personalized cold outreach templates (LaTeX stripped)',
-                  '🎯 Zero third-party redirects or trackers forever'
+                  '6–8 Hours Early Access window on new tech drops',
+                  '100% Unlocked recruiter & professor emails',
+                  'Unlimited Autonomous AI Resume Tailoring',
+                  '1-Click personalized cold outreach templates (LaTeX stripped)',
+                  'Zero third-party redirects or trackers forever'
                 ].map((perk, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />

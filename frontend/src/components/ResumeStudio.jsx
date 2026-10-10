@@ -230,7 +230,7 @@ export default function ResumeStudio() {
           showPhoto: true,
         }
       }));
-      showToast("📷 Headshot uploaded & added to resume!");
+      showToast("Headshot uploaded & added to resume!");
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -263,11 +263,11 @@ export default function ResumeStudio() {
   // Tailor Resume to Job Description
   const handleTailorResume = async () => {
     if (!jdText.trim()) {
-      showToast("⚠️ Please enter or paste a job description first.");
+      showToast("Please enter or paste a job description first.");
       return;
     }
     if (!isVip && aiTokens < 450) {
-      alert("⚠️ Free trial AI token limit reached (requires ~450 tokens).\n\nUpgrade to VIP Pass (₹75 / $9.99) for 500,000 AI tokens, unlimited JD tailoring, and verified recruiter inboxes!");
+      alert("Free trial AI token limit reached (requires ~450 tokens).\n\nUpgrade to VIP Pass (₹75 / $9.99) for 500,000 AI tokens, unlimited JD tailoring, and verified recruiter inboxes!");
       return;
     }
     setTailoringLoading(true);
@@ -292,7 +292,7 @@ export default function ResumeStudio() {
         const nextTokens = Math.max(0, aiTokens - 450);
         setAiTokens(nextTokens);
         localStorage.setItem('joborbit_ai_tokens', nextTokens.toString());
-        showToast(`🎯 Tailored to ${targetRole || 'JD'} with ${data.analysis?.tailored_score}% ATS match! (450 AI tokens deducted)`);
+        showToast(`Tailored to ${targetRole || 'JD'} with ${data.analysis?.tailored_score}% ATS match! (450 AI tokens deducted)`);
       } else {
         alert(data.message || "Tailoring failed");
       }
@@ -343,7 +343,7 @@ export default function ResumeStudio() {
   // AI Bullet Enhancer
   const handleEnhanceBullet = async (section, itemIdx, bulletIdx) => {
     if (!isVip && aiTokens < 150) {
-      alert("⚠️ Free trial AI token limit reached (requires ~150 tokens).\n\nUpgrade to VIP Pass (₹75 / $9.99) for 500,000 AI tokens and unlimited STAR enhancements!");
+      alert("Free trial AI token limit reached (requires ~150 tokens).\n\nUpgrade to VIP Pass (₹75 / $9.99) for 500,000 AI tokens and unlimited STAR enhancements!");
       return;
     }
     const key = `${section}-${itemIdx}-${bulletIdx}`;
@@ -363,7 +363,7 @@ export default function ResumeStudio() {
         const nextTokens = Math.max(0, aiTokens - 150);
         setAiTokens(nextTokens);
         localStorage.setItem('joborbit_ai_tokens', nextTokens.toString());
-        showToast("✨ Bullet point enhanced with quantifiable STAR metrics! (150 AI tokens deducted)");
+        showToast("Bullet point enhanced with quantifiable STAR metrics! (150 AI tokens deducted)");
       }
     } catch (e) {
       console.error("AI enhance error:", e);
@@ -377,7 +377,7 @@ export default function ResumeStudio() {
     if (!latexCode) return;
     navigator.clipboard.writeText(latexCode);
     setCopied(true);
-    showToast("📋 Compile-ready LaTeX copied to clipboard!");
+    showToast("Compile-ready LaTeX copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -391,7 +391,7 @@ export default function ResumeStudio() {
     link.download = `${candidateName}_${activeTemplate}.tex`;
     link.click();
     URL.revokeObjectURL(url);
-    showToast("📥 .tex source downloaded!");
+    showToast(".tex source downloaded!");
   };
 
   const [downloadingPdf, setDownloadingPdf] = useState(false);
@@ -402,7 +402,7 @@ export default function ResumeStudio() {
     const element = document.getElementById('resume-print-area');
     
     setDownloadingPdf(true);
-    showToast("⚡ Generating crisp 1-page PDF document...");
+    showToast("Generating crisp 1-page PDF document...");
 
     try {
       if (element) {
@@ -423,7 +423,7 @@ export default function ResumeStudio() {
           pagebreak: { mode: 'avoid-all' }
         };
         await html2pdf().set(opt).from(element).save();
-        showToast("✅ Downloaded crisp 1-page PDF successfully!");
+        showToast("Downloaded crisp 1-page PDF successfully!");
         setDownloadingPdf(false);
         return;
       }
@@ -447,7 +447,7 @@ export default function ResumeStudio() {
   const handleResetSample = () => {
     setResumeData(INITIAL_DATA);
     localStorage.setItem('joborbit_resume_draft', JSON.stringify(INITIAL_DATA));
-    showToast("🔄 Loaded authentic gold-standard profile!");
+    showToast("Loaded authentic gold-standard profile!");
   };
 
   return (
@@ -472,12 +472,12 @@ export default function ResumeStudio() {
             {isVip ? (
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-300 text-amber-900 text-xs font-bold shadow-2xs">
                 <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span>👑 VIP Unlimited: {aiTokens.toLocaleString()} AI Tokens (Unlimited Quota)</span>
+                <span>VIP Unlimited: {aiTokens.toLocaleString()} AI Tokens (Unlimited Quota)</span>
               </div>
             ) : (
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold">
                 <Cpu className="w-3.5 h-3.5 text-purple-600" />
-                <span>⚡ Free Quota: {aiTokens.toLocaleString()} / 2,000 Tokens</span>
+                <span>Free Quota: {aiTokens.toLocaleString()} / 2,000 Tokens</span>
                 <a href="#vip" className="underline text-purple-700 hover:text-purple-900 ml-1">Unlock 500k VIP</a>
               </div>
             )}
@@ -502,7 +502,7 @@ export default function ResumeStudio() {
             title="Tailor resume to any target Job Description"
           >
             <Target className="w-3.5 h-3.5" />
-            <span>🎯 Tailor to JD</span>
+            <span>Tailor to JD</span>
           </button>
 
           <button
@@ -675,7 +675,7 @@ export default function ResumeStudio() {
                     ) : (
                       <>
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>⚡ Tailor Resume to this Job Description</span>
+                        <span>Tailor Resume to this Job Description</span>
                       </>
                     )}
                   </button>
@@ -726,7 +726,7 @@ export default function ResumeStudio() {
                         <div className="flex flex-wrap gap-1">
                           {tailorAnalysis.matched_skills?.map((sk, sIdx) => (
                             <span key={sIdx} className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">
-                              ✓ {sk}
+                              {sk}
                             </span>
                           ))}
                         </div>
@@ -752,7 +752,7 @@ export default function ResumeStudio() {
                     <div className="border-t border-emerald-200/80 pt-2 space-y-1 text-[11px] text-slate-700">
                       {tailorAnalysis.improvements?.map((imp, iIdx) => (
                         <div key={iIdx} className="flex items-start gap-1.5">
-                          <span className="text-emerald-600 font-bold">✓</span>
+                          <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
                           <span>{imp}</span>
                         </div>
                       ))}
@@ -1443,7 +1443,7 @@ export default function ResumeStudio() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                ★ Bitstream Charter (Single-Page LaTeX ATS Standard)
+                Bitstream Charter (Single-Page LaTeX ATS Standard)
               </button>
               <button
                 onClick={() => setActiveTemplate('jake')}
@@ -1453,7 +1453,7 @@ export default function ResumeStudio() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                🏆 Jake's Resume (FAANG Classic)
+                Jake's Resume (FAANG Classic)
               </button>
             </div>
 

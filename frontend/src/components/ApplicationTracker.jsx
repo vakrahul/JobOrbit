@@ -180,8 +180,9 @@ export default function ApplicationTracker({ onOpenJob, onExploreJobs }) {
                       <span>{job.company || 'Company'}</span>
                     </span>
                     {job.location && (
-                      <span className="text-xs text-slate-500 font-medium">
-                        📍 {job.location}
+                      <span className="inline-flex items-center gap-1 text-xs text-slate-500 font-medium">
+                        <MapPin className="w-3 h-3 text-slate-400" />
+                        <span>{job.location}</span>
                       </span>
                     )}
                     {job.pay && (

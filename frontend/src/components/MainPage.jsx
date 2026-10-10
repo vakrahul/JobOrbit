@@ -127,7 +127,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
     if (job?.is_vip_exclusive && !isVip) {
       e.preventDefault();
       e.stopPropagation();
-      alert("👑 VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
+      alert("VIP Exclusive Drop!\n\nThis role is reserved for JobOrbit VIP Members (₹75/mo).\n\nUpgrade to unlock direct 1-click ATS application links, 5-hour real-time drops, and HR recruiter contacts.");
       if (onOpenVIP) {
         onOpenVIP();
       } else {
@@ -142,7 +142,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
       if (count >= 5) {
         e.preventDefault();
         e.stopPropagation();
-        alert("⚠️ Free Trial Limit Reached (5/5 Applications Used)!\n\nDuring your free trial, accounts are limited to 5 applications.\n\nUpgrade to VIP Pass (₹75 / $9.99) for unlimited direct applications and real-time drops!");
+        alert("Free Trial Limit Reached (5/5 Applications Used)!\n\nDuring your free trial, accounts are limited to 5 applications.\n\nUpgrade to VIP Pass (₹75 / $9.99) for unlimited direct applications and real-time drops!");
         if (onOpenVIP) {
           onOpenVIP();
         } else {
@@ -387,7 +387,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                 : 'bg-amber-50/80 text-amber-800 border-amber-200 hover:bg-amber-100'
             }`}
           >
-            <span>👑 VIP Drops</span>
+            <span>VIP Drops</span>
             {vipOnly && <Check className="w-3.5 h-3.5" />}
           </button>
 
@@ -399,7 +399,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
               onChange={(e) => { setNewTodayOnly(e.target.checked); setPage(1); }}
               className="rounded border-amber-300 text-amber-600 focus:ring-0 cursor-pointer"
             />
-            <span>⚡ New Today Only</span>
+            <span>New Today Only</span>
           </label>
         </div>
 
@@ -440,7 +440,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                         {/* Distinct Source Platform Badge */}
                         {job.is_vip_exclusive && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-2xs">
-                            <span>👑 VIP Drop</span>
+                            <span>VIP Drop</span>
                           </span>
                         )}
 
@@ -454,7 +454,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                               ? 'bg-purple-100 text-purple-800 border border-purple-200'
                               : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                           }`}>
-                            {job.source_platform.id === 'linkedin' ? '🔵 ' : job.source_platform.id === 'internshala' ? '🌐 ' : job.source_platform.id === 'wellfound' ? '🟣 ' : '🟢 '}
+                            
                             {job.source_platform.badge_label || job.source}
                           </span>
                         ) : job.source ? (
@@ -551,7 +551,7 @@ export default function MainPage({ onGoToAdmin, stats, onOpenJob, onOpenVIP, cur
                         onClick={(e) => handleApplyClick(e, job)}
                         className="flex-1 py-2 px-3 text-xs font-bold rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                       >
-                        <span>👑 Unlock VIP Drop (₹75)</span>
+                        <span>Unlock VIP Drop (₹75)</span>
                       </button>
                     ) : isEmail && rawEmail ? (
                       // EMAIL HR DIRECT BUTTON

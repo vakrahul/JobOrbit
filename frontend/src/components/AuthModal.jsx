@@ -236,9 +236,9 @@ export default function AuthModal({
                 </span>
                 <button 
                   onClick={() => setShowGoogleHelp(false)}
-                  className="text-blue-500 hover:text-blue-700 text-[10px]"
+                  className="text-blue-500 hover:text-blue-700"
                 >
-                  ✕
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
               <ol className="list-decimal pl-4 space-y-1.5 text-slate-700 leading-relaxed text-[11px]">
@@ -254,7 +254,7 @@ export default function AuthModal({
                 onClick={handleTestGoogleDemo}
                 className="w-full py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-colors cursor-pointer"
               >
-                ⚡ Test Authenticate With Google Now (Direct Mode)
+                Test Authenticate With Google Now (Direct Mode)
               </button>
             </div>
           )}

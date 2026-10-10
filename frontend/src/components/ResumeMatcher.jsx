@@ -288,7 +288,7 @@ export default function ResumeMatcher({ onOpenJob }) {
 
                     {/* Location / Domain */}
                     <p className="text-xs text-slate-500 line-clamp-2">
-                      {item.location ? `📍 ${item.location}` : item.department || item.company_niche || ''}
+                      {item.location ? item.location : item.department || item.company_niche || ''}
                     </p>
 
                     {/* Matching Skills */}
